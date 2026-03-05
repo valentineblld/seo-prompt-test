@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selectra – Générateur de Prompts SEO</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Bricolage+Grotesque:wght@400;600;700;800&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #f9fafb;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  min-height: 100vh;
+  color: #111827;
+}
+
+header {
+  background: #111827;
+  padding: 28px 36px 24px;
+  border-bottom: 1px solid #1f2937;
+}
+.header-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #f9fafb;
+  letter-spacing: -0.02em;
+}
+.header-sources {
+  margin-top: 10px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.source-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.dot-green { background: #4ade80; }
+.dot-red { background: #f87171; }
+
+.tabs {
+  display: flex;
+  background: #fff;
+  border-bottom: 2px solid #e5e7eb;
+  overflow-x: auto;
+}
+.tab {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+  margin-bottom: -2px;
+}
+.tab:hover { color: #111827; }
+.tab.active-opps      { color: #15803d; border-bottom-color: #15803d; font-weight: 600; }
+.tab.active-positions { color: #1d4ed8; border-bottom-color: #1d4ed8; font-weight: 600; }
+.tab.active-hebdo     { color: #b45309; border-bottom-color: #b45309; font-weight: 600; }
+
+.panel { display: none; max-width: 900px; margin: 0 auto; padding: 32px 28px 60px; }
+.panel.active { display: block; }
+
+.context-banner {
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+}
+.banner-opps      { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+.banner-positions { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
+.banner-hebdo     { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.field-full { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+label.field-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge-manual {
+  font-size: 9px; padding: 1px 7px; border-radius: 3px;
+  background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;
+  letter-spacing: .05em; text-transform: uppercase;
+}
+
+input[type="text"], input[type="date"], select, textarea {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 13px;
+  color: #111827;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 9px 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color .15s;
+}
+input:focus, select:focus, textarea:focus { border-color: #6b7280; }
+input::placeholder, textarea::placeholder { color: #9ca3af; }
+textarea {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  resize: vertical;
+  min-height: 110px;
+}
+
+.export-hint {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: #9ca3af;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 4px;
+  padding: 8px 10px;
+  line-height: 1.6;
+}
+
+.pills { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 2px; }
+.pill {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #6b7280;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+  user-select: none;
+}
+.pill:hover { border-color: #6b7280; color: #111827; }
+
+.action-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding-top: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.btn-generate {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 11px 24px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all .15s;
+  color: #fff;
+}
+.btn-copy {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 11px 24px;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  transition: all .15s;
+  display: none;
+}
+.btn-copy:hover { border-color: #374151; }
+.btn-copy.visible { display: inline-block; }
+.btn-copy.success { background: #15803d; border-color: #15803d; color: #fff; }
+
+.output-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 10px;
+  display: none;
+}
+.output-label.visible { display: block; }
+.output-box {
+  background: #111827;
+  color: #d1d5db;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  padding: 20px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 420px;
+  overflow-y: auto;
+  display: none;
+}
+.output-box.visible { display: block; }
+.output-box::-webkit-scrollbar { width: 4px; }
+.output-box::-webkit-scrollbar-thumb { background: #374151; border-radius: 2px; }
+
+@media(max-width: 600px) {
+  header, .panel { padding-left: 18px; padding-right: 18px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .tab { padding: 12px 16px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Selectra · Content France · SEO Toolkit</div>
+  <h1>Générateur de Prompts – Audit des Mots-clés & Positions</h1>
+  <div class="header-sources">
+    <span class="source-badge"><span class="dot dot-green"></span><span style="color:#4ade80">Ahrefs Rank Tracker connecté — données automatiques</span></span>
+    <span class="source-badge"><span class="dot dot-red"></span><span style="color:#f87171">Export GSC / Ahrefs Site explorer (organic keywords) — requis manuellement</span></span>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active-hebdo" onclick="switchTab('hebdo')">🟡 Analyse Hebdomadaire</button>
+  <button class="tab" onclick="switchTab('positions')">🔵 Évolutions</button>
+  <button class="tab" onclick="switchTab('opps')">🟢 Quick Wins</button>
+</div>
+
+<!-- QUICK WINS -->
+<div class="panel" id="panel-opps">
+  <div class="context-banner banner-opps">Export GSC requis · Filtrer en amont : position 4–20, impressions &gt; 50, période 3 mois</div>
+  <div class="form-grid">
+    <div class="field">
+      <label class="field-label">Site *</label>
+     <input type="text" id="o-site" placeholder="ex : selectra.info" />
+    </div>
+    <div class="field">
+      <label class="field-label">Secteur</label>
+      <input type="text" id="o-sector" placeholder="ex : Telecom / Énergie / Finance..."  />
+    </div>
+    <div class="field">
+      <label class="field-label">Pays</label>
+      <input type="text" id="o-country" value="France" />
+    </div>
+    <div class="field">
+      <label class="field-label">Fourchette de positions</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="o-pos-min" value="4" style="width:80px" />
+        <span style="color:#9ca3af;font-size:13px">→</span>
+        <input type="text" id="o-pos-max" value="20" style="width:80px" />
+      </div>
+    </div>
+    <div class="field field-full">
+      <label class="field-label">Clusters prioritaires</label>
+      <input type="text" id="o-clusters" placeholder="ex : fibre, box 4G, offres internet, comparatif" />
+    </div>
+    <div class="field field-full">
+      <label class="field-label">Export GSC — Requêtes * <span class="badge-manual">export requis</span></label>
+      <textarea id="o-export-gsc" placeholder="Colle ici ton export GSC : requête, clics, impressions, CTR, position moyenne
+OU ajoute le directement dans Claude."></textarea>
+      <div class="export-hint">GSC → Performance → Requêtes → Filtrer (position 4–20, impressions &gt; 50, 3 derniers mois)</div>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-generate" style="background:#15803d;border-color:#15803d" onclick="generate('opps')">Générer le prompt →</button>
+    <button class="btn-copy" id="copy-opps" onclick="copyPrompt('opps')">Copier le prompt</button>
+  </div>
+  <div class="output-label" id="label-opps">Prompt généré — prêt à coller dans Claude</div>
+  <pre class="output-box" id="out-opps"></pre>
+</div>
+
+<!-- ÉVOLUTIONS -->
+<div class="panel" id="panel-positions">
+  <div class="context-banner banner-positions">✓ Données récupérées automatiquement via Ahrefs Rank Tracker · GSC optionnel</div>
+  <div class="form-grid">
+    <div class="field">
+      <label class="field-label">Site *</label>
+      <input type="text" id="p-site" placeholder="ex : selectra.info" />
+    </div>
+    <div class="field">
+      <label class="field-label">Pays</label>
+      <input type="text" id="p-country" value="France" />
+    </div>
+    <div class="field">
+      <label class="field-label">Période A — début *</label>
+      <input type="date" id="p-date-a1" />
+    </div>
+    <div class="field">
+      <label class="field-label">Période A — fin *</label>
+      <input type="date" id="p-date-a2" />
+    </div>
+    <div class="field">
+      <label class="field-label">Période B — début *</label>
+      <input type="date" id="p-date-b1" />
+    </div>
+    <div class="field">
+      <label class="field-label">Période B — fin *</label>
+      <input type="date" id="p-date-b2" />
+    </div>
+    <div class="field">
+      <label class="field-label">Seuil de variation</label>
+      <input type="text" id="p-threshold" value="±3 positions" />
+    </div>
+    <div class="field">
+      <label class="field-label">Hypothèses à explorer</label>
+      <div class="pills" id="p-hypotheses">
+        <span class="pill active-pill" data-value="Mise à jour Google">Mise à jour Google</span>
+        <span class="pill active-pill" data-value="Dégradation du contenu">Dégradation contenu</span>
+        <span class="pill active-pill" data-value="Nouveau concurrent">Nouveau concurrent</span>
+        <span class="pill active-pill" data-value="Problème technique">Problème technique</span>
+        <span class="pill active-pill" data-value="Cannibalisation">Cannibalisation</span>
+        <span class="pill" data-value="Saisonnalité">Saisonnalité</span>
+      </div>
+    </div>
+    <div class="field field-full">
+      <label class="field-label">Export GSC comparatif — optionnel</label>
+      <textarea id="p-export-gsc" placeholder="OPTIONNEL : export GSC avec comparaison de deux périodes à coller ici en CSV OU à joindre sur Claude." style="min-height:70px"></textarea>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-generate" style="background:#1d4ed8;border-color:#1d4ed8" onclick="generate('positions')">Générer le prompt →</button>
+    <button class="btn-copy" id="copy-positions" onclick="copyPrompt('positions')">Copier le prompt</button>
+  </div>
+  <div class="output-label" id="label-positions">Prompt généré — prêt à coller dans Claude</div>
+  <pre class="output-box" id="out-positions"></pre>
+</div>
+
+<!-- ANALYSE HEBDOMADAIRE -->
+<div class="panel active" id="panel-hebdo">
+  <div class="context-banner banner-hebdo">Export Ahrefs Organic Keywords requis · Génère un fichier Excel d'analyse par cluster</div>
+  <div class="form-grid">
+    <div class="field">
+      <label class="field-label">Site *</label>
+      <input type="text" id="h-site" placeholder="ex : selectra.info" />
+    </div>
+    <div class="field">
+      <label class="field-label">Langue de sortie</label>
+      <select id="h-lang">
+        <option value="français">Français</option>
+        <option value="anglais">Anglais</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Périmètre *</label>
+      <input type="text" id="h-perimetre" placeholder="ex : provider / multi / répertoire précis..." />
+    </div>
+    <div class="field">
+      <label class="field-label">Marché(s) analysé(s) *</label>
+      <input type="text" id="h-marche" placeholder="ex : fibre / box + mobile / mobile..." />
+    </div>
+    <div class="field field-full">
+      <label class="field-label">Export Ahrefs — Organic Keywords * <span class="badge-manual">export requis</span></label>
+      <textarea id="h-export" placeholder="Colle ici ton export CSV Ahrefs (colonnes attendues : Keyword, URL, Position, Volume, KD, Position change…)
+OU ajoute le directement dans Claude."></textarea>
+      <div class="export-hint">Ahrefs → Site Explorer → Organic Keywords<br>
+Colonnes obligatoires : Keyword, Volume, Previous position, Current position, Position change, Current URL<br>
+~ 500 lignes max.</div>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-generate" style="background:#b45309;border-color:#b45309" onclick="generate('hebdo')">Générer le prompt →</button>
+    <button class="btn-copy" id="copy-hebdo" onclick="copyPrompt('hebdo')">Copier le prompt</button>
+  </div>
+  <div class="output-label" id="label-hebdo">Prompt généré — prêt à coller dans Claude</div>
+  <pre class="output-box" id="out-hebdo"></pre>
+</div>
+
+<script>
+const tabIds    = ['hebdo', 'positions', 'opps'];
+const tabColors = { opps: 'active-opps', positions: 'active-positions', hebdo: 'active-hebdo' };
+
+function switchTab(id) {
+  tabIds.forEach((t, i) => {
+    const tab = document.querySelectorAll('.tab')[i];
+    tab.className = 'tab' + (t === id ? ' ' + tabColors[t] : '');
+    document.getElementById('panel-' + t).classList.toggle('active', t === id);
+  });
+}
+
+const pillColors = { 'p-hypotheses': '#1d4ed8' };
+
+document.querySelectorAll('.pills').forEach(group => {
+  const color = pillColors[group.id] || '#374151';
+  group.querySelectorAll('.pill').forEach(pill => {
+    if (pill.classList.contains('active-pill')) {
+      pill.style.background = color;
+      pill.style.borderColor = color;
+      pill.style.color = '#fff';
+      pill.dataset.active = '1';
+    }
+    pill.addEventListener('click', () => {
+      const on = pill.dataset.active === '1';
+      if (on) {
+        pill.dataset.active = '0';
+        pill.style.background = '#fff';
+        pill.style.borderColor = '#d1d5db';
+        pill.style.color = '#6b7280';
+      } else {
+        pill.dataset.active = '1';
+        pill.style.background = color;
+        pill.style.borderColor = color;
+        pill.style.color = '#fff';
+      }
+    });
+  });
+});
+
+function getChecked(groupId) {
+  return Array.from(document.querySelectorAll('#' + groupId + ' .pill'))
+    .filter(p => p.dataset.active === '1')
+    .map(p => p.dataset.value);
+}
+
+function v(id) { return (document.getElementById(id)?.value || '').trim(); }
+
+function generate(type) {
+  let prompt = '';
+
+  if (type === 'opps') {
+    const site = v('o-site') || '[NOM DU SITE]';
+    const sector    = v('o-sector') || '[secteur]';
+    const country   = v('o-country') || 'France';
+    const posMin    = v('o-pos-min') || '4';
+    const posMax    = v('o-pos-max') || '20';
+    const clusters  = v('o-clusters');
+    const exportGSC = v('o-export-gsc');
+
+    prompt =
+`Tu es un consultant SEO senior. Je vais te fournir un export GSC pour le site ${site}.
+
+CONTEXTE
+Site    : ${site}
+Secteur : ${sector}
+Marché  : ${country}
+${clusters ? 'Clusters prioritaires : ' + clusters : ''}
+
+DONNÉES FOURNIES
+Export GSC — Requêtes sur les 3 derniers mois, pré-filtré :
+- Position moyenne entre ${posMin} et ${posMax}
+- Impressions > 50
+
+MISSION
+Identifie les quick wins les plus actionnables : mots-clés déjà bien positionnés qui peuvent gagner des places avec des optimisations légères.
+
+Pour chaque quick win, fournis :
+1. Le mot-clé + position actuelle + impressions + CTR
+2. L'URL positionnée
+3. Le gap estimé (nombre de positions à gagner pour atteindre le top 3)
+4. Une recommandation concrète et unique parmi :
+   - Optimisation title / H1
+   - Enrichissement sémantique du contenu
+   - Amélioration du maillage interne
+   - Reformulation de la meta description pour améliorer le CTR
+5. Priorité : Haute / Moyenne / Faible (basée sur les impressions et la position actuelle)
+
+FORMAT DE SORTIE
+Tableau Markdown : Mot-clé | Position | Impressions | CTR | URL | Recommandation | Priorité
+Trié par priorité décroissante.
+Puis un encadré "Top 5 actions immédiates" avec les 5 quick wins les plus impactants.
+
+─── EXPORT GSC — REQUÊTES ───
+${exportGSC || '[colle ici : GSC → Performance → Requêtes → Télécharger]'}`;
+  }
+
+  else if (type === 'positions') {
+    const hypotheses = getChecked('p-hypotheses');
+    const exportGSC  = v('p-export-gsc');
+    const threshold  = v('p-threshold') || '±3 positions';
+    prompt =
+`Tu es un analyste SEO expert en interprétation de données de positionnement.
+
+CONTEXTE
+Site     : ${v('p-site') || '[NOM DU SITE]'}
+Marché   : ${v('p-country') || 'France'}
+Période A (référence) : ${v('p-date-a1') || '[date début]'} → ${v('p-date-a2') || '[date fin]'}
+Période B (récente)   : ${v('p-date-b1') || '[date début]'} → ${v('p-date-b2') || '[date fin]'}
+Seuil de variation    : ${threshold}
+
+NOTE : Les données de positionnement sont récupérées automatiquement depuis le Rank Tracker Ahrefs.
+
+MISSION — 3 sections :
+
+SECTION 1 — GAINS NOTABLES
+Mots-clés ayant progressé de ${threshold} ou plus, triés par volume décroissant.
+Colonnes : Mot-clé | Volume | Position A | Position B | Delta | URL
+
+SECTION 2 — CHUTES SIGNIFICATIVES
+Mots-clés ayant perdu ${threshold} ou plus.
+Pour chaque chute, propose une hypothèse parmi :
+${hypotheses.map(h => '- ' + h).join('\n')}
+Colonnes : Mot-clé | Volume | Position A | Position B | Delta | URL | Hypothèse
+
+SECTION 3 — TENDANCES GÉNÉRALES
+Résumé de 5 à 8 lignes : clusters qui progressent / régressent, visibilité globale, points d'attention prioritaires.
+${exportGSC ? '\n─── EXPORT GSC COMPARATIF ───\n' + exportGSC : ''}`;
+  }
+
+  else if (type === 'hebdo') {
+    const site = v('h-site') || '[NOM DU SITE]';
+    const lang       = v('h-lang') || 'français';
+    const perimetre  = v('h-perimetre') || '[à préciser]';
+    const marche     = v('h-marche') || '[à préciser]';
+    const exportData = v('h-export');
+    const today      = new Date();
+    const dateStr    = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
+
+    prompt =
+`Tu es un analyste SEO expert en interprétation de données de positionnement.
+Je te joins un export Ahrefs pour ${site}. Génère le fichier Excel d'analyse hebdomadaire selon les instructions ci-dessous.
+
+CHAMPS DE CONTEXTE
+Site                  : ${site}
+Périmètre             : ${perimetre}
+Marché(s) analysé(s)  : ${marche}
+Langue de sortie      : ${lang}
+
+STRUCTURE DU FICHIER
+Deux onglets : "Analyse Mots-Clés S-1" et "Synthèse".
+
+ONGLET ANALYSE
+Tableau avec les colonnes : Catégorie / Pos. moy. / Pos. moy. S-1 / Keyword / Volume / KD / Pos. actuelle / Variation / URL.
+
+Identifie les clusters à partir des URLs présentes dans l'export en regroupant les mots-clés par répertoire (ex : /guide/, /installation/, /comparer-les-offres/, /offre-fibre/orange/, etc.).
+Crée un cluster par répertoire principal, nomme-le de façon lisible, et sélectionne ~10 MC parmi les plus pertinents (volume + KD + pertinence thématique).
+Si deux répertoires sont très proches thématiquement et peu fournis, tu peux les fusionner en un seul cluster.
+
+Pour la colonne "Pos. actuelle" : indique toujours la position numérique, y compris pour les nouveaux mots-clés.
+Pour la colonne "Variation" :
+- ▲ +X (vert) / ▼ -X (rouge) pour les variations
+- "New" (vert) pour les nouveaux MC sans historique
+- "Lost" (rouge) pour les MC perdus
+
+La position moyenne par cluster (colonne "Pos. moy.") se calcule sur les ~10 MC sélectionnés à partir de leur position actuelle.
+La colonne "Pos. moy. S-1" est la moyenne des positions S-1 de ces mêmes MC, lue directement depuis la colonne "Previous position" de l'export.
+
+ONGLET SYNTHÈSE
+Analyse courte en 4 blocs :
+🟢 Points positifs
+🔴 Points de vigilance
+📊 Tendances par cluster
+💡 Actions recommandées
+Rédigée en ${lang}.
+
+RAPPEL TECHNIQUE
+- Export Ahrefs = positions du jour vs S-1
+- La colonne "Position change" = évolution vs S-1
+- Nom du fichier de sortie : analyse_keywords_${site}_${dateStr}.xlsx
+
+─── EXPORT AHREFS — ORGANIC KEYWORDS ───
+${exportData || '[colle ici : Ahrefs → Site Explorer → Organic Keywords → Export CSV]'}`;
+  }
+
+  document.getElementById('out-' + type).textContent = prompt;
+  document.getElementById('out-' + type).classList.add('visible');
+  document.getElementById('label-' + type).classList.add('visible');
+  document.getElementById('copy-' + type).classList.add('visible');
+  document.getElementById('out-' + type).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyPrompt(type) {
+  const text = document.getElementById('out-' + type).textContent;
+  const btn  = document.getElementById('copy-' + type);
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copié ✓';
+    btn.classList.add('success');
+    setTimeout(() => { btn.textContent = 'Copier le prompt'; btn.classList.remove('success'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
