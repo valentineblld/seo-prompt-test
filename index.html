@@ -6,16 +6,13 @@
 <title>Selectra – Générateur de Prompts SEO</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Bricolage+Grotesque:wght@400;600;700;800&display=swap');
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
   background: #f9fafb;
   font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   min-height: 100vh;
   color: #111827;
 }
-
 header {
   background: #111827;
   padding: 28px 36px 24px;
@@ -51,7 +48,6 @@ header h1 {
 .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 .dot-green { background: #4ade80; }
 .dot-red { background: #f87171; }
-
 .tabs {
   display: flex;
   background: #fff;
@@ -78,16 +74,8 @@ header h1 {
 .tab.active-positions { color: #1d4ed8; border-bottom-color: #1d4ed8; font-weight: 600; }
 .tab.active-hebdo     { color: #b45309; border-bottom-color: #b45309; font-weight: 600; }
 .tab.active-optims    { color: #7e22ce; border-bottom-color: #7e22ce; font-weight: 600; }
-.banner-optims    { background: #faf5ff; border: 1px solid #e9d5ff; color: #7e22ce; }
-.badge-auto {
-  font-size: 9px; padding: 1px 7px; border-radius: 3px;
-  background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
-  letter-spacing: .05em; text-transform: uppercase;
-}
-
 .panel { display: none; max-width: 900px; margin: 0 auto; padding: 32px 28px 60px; }
 .panel.active { display: block; }
-
 .context-banner {
   border-radius: 8px;
   padding: 10px 16px;
@@ -99,7 +87,20 @@ header h1 {
 .banner-positions { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
 .banner-hebdo     { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; }
 .banner-optims    { background: #faf5ff; border: 1px solid #e9d5ff; color: #7e22ce; }
-
+.field-section {
+  grid-column: 1 / -1;
+  border-top: 1px dashed #e5e7eb;
+  padding-top: 4px;
+  margin-top: 4px;
+}
+.field-section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #d1d5db;
+  margin-bottom: 14px;
+}
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -108,7 +109,6 @@ header h1 {
 }
 .field-full { grid-column: 1 / -1; }
 .field { display: flex; flex-direction: column; gap: 6px; }
-
 label.field-label {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10px;
@@ -129,7 +129,11 @@ label.field-label {
   background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
   letter-spacing: .05em; text-transform: uppercase;
 }
-
+.badge-opt {
+  font-size: 9px; padding: 1px 7px; border-radius: 3px;
+  background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb;
+  letter-spacing: .05em; text-transform: uppercase;
+}
 input[type="text"], input[type="date"], select, textarea {
   font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-size: 13px;
@@ -151,7 +155,6 @@ textarea {
   resize: vertical;
   min-height: 110px;
 }
-
 .export-hint {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10px;
@@ -162,7 +165,6 @@ textarea {
   padding: 8px 10px;
   line-height: 1.6;
 }
-
 .pills { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 2px; }
 .pill {
   padding: 5px 12px;
@@ -177,7 +179,6 @@ textarea {
   user-select: none;
 }
 .pill:hover { border-color: #6b7280; color: #111827; }
-
 .action-bar {
   display: flex;
   gap: 10px;
@@ -215,7 +216,6 @@ textarea {
 .btn-copy:hover { border-color: #374151; }
 .btn-copy.visible { display: inline-block; }
 .btn-copy.success { background: #15803d; border-color: #15803d; color: #fff; }
-
 .output-label {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10px;
@@ -243,7 +243,6 @@ textarea {
 .output-box.visible { display: block; }
 .output-box::-webkit-scrollbar { width: 4px; }
 .output-box::-webkit-scrollbar-thumb { background: #374151; border-radius: 2px; }
-
 @media(max-width: 600px) {
   header, .panel { padding-left: 18px; padding-right: 18px; }
   .form-grid { grid-template-columns: 1fr; }
@@ -257,8 +256,8 @@ textarea {
   <div class="header-eyebrow">Selectra · Content France · SEO Toolkit</div>
   <h1>Générateur de Prompts – Audit des Mots-clés & Positions</h1>
   <div class="header-sources">
-    <span class="source-badge"><span class="dot dot-green"></span><span style="color:#4ade80">Ahrefs Rank Tracker connecté — données automatiques</span></span>
-    <span class="source-badge"><span class="dot dot-red"></span><span style="color:#f87171">Export GSC / Ahrefs Site explorer (organic keywords) — requis manuellement</span></span>
+    <span class="source-badge"><span class="dot dot-green"></span><span style="color:#4ade80">Ahrefs connecté — données automatiques (Rank Tracker + Site Explorer)</span></span>
+    <span class="source-badge"><span class="dot dot-red"></span><span style="color:#f87171">Export GSC — requis manuellement (Quick Wins)</span></span>
   </div>
 </header>
 
@@ -273,6 +272,7 @@ textarea {
 <div class="panel active" id="panel-hebdo">
   <div class="context-banner banner-hebdo">✓ Données récupérées automatiquement via le connecteur Ahrefs · Génère un fichier Excel d'analyse par cluster</div>
   <div class="form-grid">
+
     <div class="field">
       <label class="field-label">Site *</label>
       <input type="text" id="h-site" placeholder="ex : selectra.info" />
@@ -292,6 +292,36 @@ textarea {
       <label class="field-label">Marché(s) analysé(s) *</label>
       <input type="text" id="h-marche" placeholder="ex : fibre / box + mobile / mobile..." />
     </div>
+
+    <!-- Séparateur filtres -->
+    <div class="field-section">
+      <div class="field-section-label">Filtres de périmètre — optionnels</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">URL contient <span class="badge-opt">optionnel</span></label>
+      <input type="text" id="h-url-include" placeholder="ex : /offre-fibre/orange/, /offre-box/free/" />
+      <div class="export-hint">Restreint aux URLs contenant ces répertoires. Séparer par des virgules.</div>
+    </div>
+    <div class="field">
+      <label class="field-label">URL exclut <span class="badge-opt">optionnel</span></label>
+      <input type="text" id="h-url-exclude" placeholder="ex : /sfr/, /free/, /bouygues/" />
+      <div class="export-hint">Exclut les URLs contenant ces chaînes. Séparer par des virgules.</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Keyword contient <span class="badge-opt">optionnel</span></label>
+      <input type="text" id="h-kw-include" placeholder="ex : fibre, optique, haut débit" />
+      <div class="export-hint">Garde uniquement les MC contenant un de ces termes. Séparer par des virgules.</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Mots-clés brandés <span class="badge-opt">optionnel</span></label>
+      <select id="h-branded">
+        <option value="">Tous (pas de filtre)</option>
+        <option value="branded">Brandés uniquement (is_branded=true)</option>
+        <option value="nonbranded">Non-brandés uniquement (is_branded=false)</option>
+      </select>
+    </div>
+
   </div>
   <div class="action-bar">
     <button class="btn-generate" style="background:#b45309;border-color:#b45309" onclick="generate('hebdo')">Générer le prompt →</button>
@@ -452,7 +482,6 @@ function switchTab(id) {
 }
 
 const pillColors = { 'p-hypotheses': '#1d4ed8' };
-
 document.querySelectorAll('.pills').forEach(group => {
   const color = pillColors[group.id] || '#374151';
   group.querySelectorAll('.pill').forEach(pill => {
@@ -491,14 +520,50 @@ function generate(type) {
   let prompt = '';
 
   if (type === 'hebdo') {
-  const site      = v('h-site') || '[NOM DU SITE]';
-  const lang      = v('h-lang') || 'français';
-  const perimetre = v('h-perimetre') || '[à préciser]';
-  const marche    = v('h-marche') || '[à préciser]';
-  const today     = new Date();
-  const dateStr   = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
+    const site        = v('h-site') || '[NOM DU SITE]';
+    const lang        = v('h-lang') || 'français';
+    const perimetre   = v('h-perimetre') || '[à préciser]';
+    const marche      = v('h-marche') || '[à préciser]';
+    const urlInclude  = v('h-url-include');
+    const urlExclude  = v('h-url-exclude');
+    const kwInclude   = v('h-kw-include');
+    const branded     = v('h-branded');
 
-  prompt =
+    // Dates automatiques : aujourd'hui et S-1 (7 jours avant)
+    const today       = new Date();
+    const s1          = new Date(today); s1.setDate(s1.getDate() - 7);
+    const fmt         = d => d.toISOString().split('T')[0]; // YYYY-MM-DD pour l'API
+    const fmtFr       = d => String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+    const dateApi     = fmt(today);
+    const dateS1Api   = fmt(s1);
+    const dateStr     = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
+
+    // Construire le bloc filtres dynamiquement
+    const filtres = [];
+
+    if (urlInclude) {
+      const segs = urlInclude.split(',').map(s => s.trim()).filter(Boolean);
+      filtres.push(`• URL contient : conserver uniquement les résultats dont best_position_url contient ${segs.map(s => '"'+s+'"').join(' OU ')}`);
+    }
+    if (urlExclude) {
+      const segs = urlExclude.split(',').map(s => s.trim()).filter(Boolean);
+      filtres.push(`• URL exclut : éliminer les résultats dont best_position_url contient ${segs.map(s => '"'+s+'"').join(' OU ')}`);
+    }
+    if (kwInclude) {
+      const terms = kwInclude.split(',').map(s => s.trim()).filter(Boolean);
+      filtres.push(`• Keyword contient : conserver uniquement les MC dont le keyword contient ${terms.map(s => '"'+s+'"').join(' OU ')} (filtre : keyword isubstring)`);
+    }
+    if (branded === 'branded') {
+      filtres.push(`• Mots-clés brandés uniquement : appliquer is_branded=true`);
+    } else if (branded === 'nonbranded') {
+      filtres.push(`• Mots-clés non-brandés uniquement : appliquer is_branded=false`);
+    }
+
+    const filtresBlock = filtres.length > 0
+      ? `\nFILTRES DE PÉRIMÈTRE\nApplique ces filtres lors de l'appel au connecteur Ahrefs :\n${filtres.join('\n')}\n`
+      : '';
+
+    prompt =
 `Tu es un analyste SEO expert en interprétation de données de positionnement.
 Utilise le connecteur Ahrefs pour récupérer les données du site ${site} (Site Explorer → Organic Keywords). Génère le fichier Excel d'analyse hebdomadaire selon les instructions ci-dessous.
 
@@ -507,7 +572,9 @@ Site                  : ${site}
 Périmètre             : ${perimetre}
 Marché(s) analysé(s)  : ${marche}
 Langue de sortie      : ${lang}
-
+Date d'analyse        : ${fmtFr(today)} → paramètre API date="${dateApi}"
+Date de comparaison   : ${fmtFr(s1)} (S-1, 7 jours avant) → paramètre API date_compared="${dateS1Api}"
+${filtresBlock}
 STRUCTURE DU FICHIER
 Deux onglets : "Analyse Mots-Clés S-1" et "Synthèse".
 
@@ -525,7 +592,7 @@ Pour la colonne "Variation" :
 - "Lost" (rouge) pour les MC perdus
 
 La position moyenne par cluster (colonne "Pos. moy.") se calcule sur les ~10 MC sélectionnés à partir de leur position actuelle.
-La colonne "Pos. moy. S-1" correspond à la position de la semaine précédente, récupérée via le connecteur (champ "previous_position").
+La colonne "Pos. moy. S-1" correspond à la position de la semaine précédente, récupérée via le connecteur (champ "best_position_prev").
 
 ONGLET SYNTHÈSE
 Analyse courte en 4 blocs :
@@ -537,9 +604,10 @@ Rédigée en ${lang}.
 
 RAPPEL TECHNIQUE
 - Récupère les données via le connecteur Ahrefs : Site Explorer → Organic Keywords, mode subdomains, pays FR
-- Utilise le champ "position" pour la Pos. actuelle et "position_compared_to" ou "previous_position" pour la Pos. S-1
+- Paramètres obligatoires : target="${site}", date="${dateApi}", date_compared="${dateS1Api}", country="FR"
+- Champs à utiliser : best_position (pos. actuelle), best_position_prev (pos. S-1), best_position_diff (variation)
 - Nom du fichier de sortie : analyse_keywords_${site}_${dateStr}.xlsx`;
-}
+  }
 
   else if (type === 'optims') {
     const site    = v('x-site') || '[NOM DU SITE]';
@@ -548,7 +616,6 @@ RAPPEL TECHNIQUE
     const kws     = v('x-kw');
     const today   = new Date();
     const dateStr = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
-
     prompt =
 `Tu es un analyste SEO expert en interprétation de données et Data Visualization.
 Utilise le connecteur Ahrefs pour le site ${site}. Ton objectif est de générer un fichier Excel d'analyse hebdomadaire en te concentrant sur les récentes optimisations.
@@ -577,8 +644,7 @@ Résumé analytique structuré en 4 blocs :
 Rédigé en ${lang}.
 
 RAPPEL TECHNIQUE
-- Utilise la colonne "Previous position" pour la Pos. S-1
-- Utilise la colonne "Position" pour la Pos. Actuelle
+- Champs à utiliser : best_position (pos. actuelle), best_position_prev (pos. S-1), best_position_diff (variation)
 - Si un export Ahrefs a été joint en PDF dans cette conversation, utilise-le en priorité. Sinon, récupère les données via le connecteur.`;
   }
 
@@ -623,7 +689,6 @@ ${exportGSC ? '\n─── EXPORT GSC COMPARATIF ───\n' + exportGSC : ''}`
     const posMax    = v('o-pos-max') || '20';
     const clusters  = v('o-clusters');
     const exportGSC = v('o-export-gsc');
-
     prompt =
 `Tu es un consultant SEO senior. Je vais te fournir un export GSC pour le site ${site}.
 
