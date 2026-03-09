@@ -288,6 +288,14 @@ textarea {
       <label class="field-label">Marché(s) analysé(s) *</label>
       <input type="text" id="h-marche" placeholder="ex : fibre optique en france / box + mobile..." />
     </div>
+    <div class="field field-full">
+      <label class="field-label">Filtres Ahrefs <span class="badge-opt">optionnel</span></label>
+      <textarea id="h-ahrefs-filters" placeholder="ex :
+- Récupère tous les mots-clés contenant &quot;fibre&quot; (non-brandés)
+- Limite à 500 résultats, triés par volume décroissant
+- Utilise mode=subdomains" style="min-height:90px"></textarea>
+      <div class="export-hint">Instructions spécifiques pour la récupération des données via Ahrefs (mode, limite, filtres, tri, etc.)</div>
+    </div>
     <!-- Séparateur filtres -->
     <div class="field-section">
       <div class="field-section-label">Filtres de périmètre — optionnels (utiliser inclusion OU exclusion selon votre besoin)</div>
@@ -500,6 +508,10 @@ function generate(type) {
     const s1          = new Date(today); s1.setDate(s1.getDate() - 7);
     const fmt         = d => d.toISOString().split('T')[0];
     const dateStr     = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
+    const ahrefsBlock = ahrefsFilters 
+      ? `\nFILTRES AHREFS\n${ahrefsFilters}\n` 
+      : '';
+    
     let filtresBlock = '';
     if (urlInclude) {
       const paths = urlInclude.split(',').map(s => s.trim()).filter(Boolean);
@@ -508,6 +520,7 @@ function generate(type) {
       const paths = urlExclude.split(',').map(s => s.trim()).filter(Boolean);
       filtresBlock = `\nExclure les URLs contenant :\n${paths.map(p => '- ' + p).join('\n')}\n`;
     }
+    
     prompt =
 `Tu es un analyste SEO expert en interprétation de données de positionnement.
 Utilise le connecteur Ahrefs pour récupérer les données du site ${site} (Site Explorer → Organic Keywords). Génère le fichier Excel d'analyse hebdomadaire selon les instructions ci-dessous.
@@ -515,21 +528,26 @@ CHAMPS DE CONTEXTE
 Site                  : ${site}
 Périmètre             : ${perimetre}
 Marché(s) analysé(s)  : ${marche}
-Langue de sortie      : ${lang}${filtresBlock}
+Langue de sortie      : ${lang}${ahrefsBlock}${filtresBlock}
 STRUCTURE DU FICHIER
 Deux onglets : "Analyse Mots-Clés S-1" et "Synthèse".
+
 ONGLET ANALYSE
 Tableau avec les colonnes : Catégorie / Pos. moy. / Pos. moy. S-1 / Keyword / Volume / KD / Pos. actuelle / Variation / URL.
+
 Identifie les clusters à partir des URLs en regroupant les mots-clés par répertoire (ex : /guide/, /installation/, /comparer-les-offres/, etc.).
 Crée un cluster par répertoire principal, nomme-le de façon lisible, et sélectionne ~10 MC parmi les plus pertinents (volume + KD + pertinence thématique).
 Si deux répertoires sont très proches thématiquement et peu fournis, tu peux les fusionner en un seul cluster.
+
 Pour la colonne "Pos. actuelle" : indique toujours la position numérique, y compris pour les nouveaux mots-clés.
 Pour la colonne "Variation" :
 - ▲ +X (vert) / ▼ -X (rouge) pour les variations
 - "New" (vert) pour les nouveaux MC sans historique
 - "Lost" (rouge) pour les MC perdus
+
 La position moyenne par cluster (colonne "Pos. moy.") se calcule sur les ~10 MC sélectionnés à partir de leur position actuelle.
 La colonne "Pos. moy. S-1" correspond à la position de la semaine précédente, récupérée via le connecteur (champ "best_position_prev").
+
 ONGLET SYNTHÈSE
 Analyse courte en 4 blocs :
 🟢 Points positifs
@@ -537,41 +555,9 @@ Analyse courte en 4 blocs :
 📊 Tendances par cluster
 💡 Actions recommandées
 Rédigée en ${lang}.
+
 RAPPEL TECHNIQUE
 Nom du fichier : analyse_keywords_${site}_${dateStr}.xlsx`;
-  }
-  else if (type === 'optims') {
-    const site    = v('x-site') || '[NOM DU SITE]';
-    const lang    = v('x-lang') || 'Français';
-    const urls    = v('x-urls') || '[liste des URLs à surveiller]';
-    const kws     = v('x-kw');
-    const today   = new Date();
-    const dateStr = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
-    prompt =
-`Tu es un analyste SEO expert en interprétation de données et Data Visualization.
-Utilise le connecteur Ahrefs pour le site ${site}. Ton objectif est de générer un fichier Excel d'analyse hebdomadaire en te concentrant sur les récentes optimisations.
-CONTEXTE ET CIBLAGE
-URLs stratégiques à surveiller (pages récemment optimisées ou créées) :
-${urls}
-${kws ? '\nMots-clés "Top Priorité" (à inclure impérativement dans l\'analyse) :\n' + kws : ''}
-STRUCTURE DU FICHIER EXCEL
-Génère un fichier nommé : analyse_seo_optims_${site}_${dateStr}.xlsx
-Deux onglets :
-ONGLET 1 : "Analyse Mots-Clés S-1"
-Tableau avec les colonnes : URL / Keyword / Volume / KD / Pos. S-1 / Pos. Actuelle / Variation
-- Logique de tri : regroupe par URL
-- Variation : ▲ +X (vert) / ▼ -X (rouge) / "New" (vert) / "Lost" (rouge)
-- Sélection : affiche en priorité les mots-clés "Top Priorité" listés ci-dessus s'ils sont présents, complétés par les meilleurs MC pour atteindre ~10 MC par URL
-ONGLET 2 : "Synthèse & KPI"
-Résumé analytique structuré en 4 blocs :
-🟢 Performances : quelles optimisations portent leurs fruits ?
-🔴 Alertes : pertes de positions sur les mots-clés à fort volume
-📊 KPI par URL : position moyenne actuelle vs S-1 pour chaque URL stratégique
-💡 Next Steps : recommandations concrètes (maillage interne, mise à jour contenu, etc.)
-Rédigé en ${lang}.
-RAPPEL TECHNIQUE
-- Champs à utiliser : best_position (pos. actuelle), best_position_prev (pos. S-1), best_position_diff (variation)
-- Si un export Ahrefs a été joint en PDF dans cette conversation, utilise-le en priorité. Sinon, récupère les données via le connecteur.`;
   }
   else if (type === 'positions') {
     const hypotheses = getChecked('p-hypotheses');
