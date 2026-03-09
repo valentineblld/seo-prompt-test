@@ -77,6 +77,13 @@ header h1 {
 .tab.active-opps      { color: #15803d; border-bottom-color: #15803d; font-weight: 600; }
 .tab.active-positions { color: #1d4ed8; border-bottom-color: #1d4ed8; font-weight: 600; }
 .tab.active-hebdo     { color: #b45309; border-bottom-color: #b45309; font-weight: 600; }
+.tab.active-optims    { color: #7e22ce; border-bottom-color: #7e22ce; font-weight: 600; }
+.banner-optims    { background: #faf5ff; border: 1px solid #e9d5ff; color: #7e22ce; }
+.badge-auto {
+  font-size: 9px; padding: 1px 7px; border-radius: 3px;
+  background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
+  letter-spacing: .05em; text-transform: uppercase;
+}
 
 .panel { display: none; max-width: 900px; margin: 0 auto; padding: 32px 28px 60px; }
 .panel.active { display: block; }
@@ -91,6 +98,7 @@ header h1 {
 .banner-opps      { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
 .banner-positions { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
 .banner-hebdo     { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; }
+.banner-optims    { background: #faf5ff; border: 1px solid #e9d5ff; color: #7e22ce; }
 
 .form-grid {
   display: grid;
@@ -114,6 +122,11 @@ label.field-label {
 .badge-manual {
   font-size: 9px; padding: 1px 7px; border-radius: 3px;
   background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;
+  letter-spacing: .05em; text-transform: uppercase;
+}
+.badge-auto {
+  font-size: 9px; padding: 1px 7px; border-radius: 3px;
+  background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
   letter-spacing: .05em; text-transform: uppercase;
 }
 
@@ -251,51 +264,80 @@ textarea {
 
 <div class="tabs">
   <button class="tab active-hebdo" onclick="switchTab('hebdo')">🟡 Analyse Hebdomadaire</button>
+  <button class="tab" onclick="switchTab('optims')">🟣 Suivi Optimisations</button>
   <button class="tab" onclick="switchTab('positions')">🔵 Évolutions</button>
   <button class="tab" onclick="switchTab('opps')">🟢 Quick Wins</button>
 </div>
 
-<!-- QUICK WINS -->
-<div class="panel" id="panel-opps">
-  <div class="context-banner banner-opps">Export GSC requis · Filtrer en amont : position 4–20, impressions &gt; 50, période 3 mois</div>
+<!-- ANALYSE HEBDOMADAIRE -->
+<div class="panel active" id="panel-hebdo">
+  <div class="context-banner banner-hebdo">✓ Données récupérées automatiquement via le connecteur Ahrefs · Génère un fichier Excel d'analyse par cluster</div>
   <div class="form-grid">
     <div class="field">
       <label class="field-label">Site *</label>
-     <input type="text" id="o-site" placeholder="ex : selectra.info" />
+      <input type="text" id="h-site" placeholder="ex : selectra.info" />
     </div>
     <div class="field">
-      <label class="field-label">Secteur</label>
-      <input type="text" id="o-sector" placeholder="ex : Telecom / Énergie / Finance..."  />
+      <label class="field-label">Langue de sortie</label>
+      <select id="h-lang">
+        <option value="français">Français</option>
+        <option value="anglais">Anglais</option>
+      </select>
     </div>
     <div class="field">
-      <label class="field-label">Pays</label>
-      <input type="text" id="o-country" value="France" />
+      <label class="field-label">Périmètre *</label>
+      <input type="text" id="h-perimetre" placeholder="ex : provider / multi / répertoire précis..." />
     </div>
     <div class="field">
-      <label class="field-label">Fourchette de positions</label>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="text" id="o-pos-min" value="4" style="width:80px" />
-        <span style="color:#9ca3af;font-size:13px">→</span>
-        <input type="text" id="o-pos-max" value="20" style="width:80px" />
-      </div>
-    </div>
-    <div class="field field-full">
-      <label class="field-label">Clusters prioritaires</label>
-      <input type="text" id="o-clusters" placeholder="ex : fibre, box 4G, offres internet, comparatif" />
-    </div>
-    <div class="field field-full">
-      <label class="field-label">Export GSC — Requêtes * <span class="badge-manual">export requis</span></label>
-      <textarea id="o-export-gsc" placeholder="Colle ici ton export GSC : requête, clics, impressions, CTR, position moyenne
-OU ajoute le directement dans Claude."></textarea>
-      <div class="export-hint">GSC → Performance → Requêtes → Filtrer (position 4–20, impressions &gt; 50, 3 derniers mois)</div>
+      <label class="field-label">Marché(s) analysé(s) *</label>
+      <input type="text" id="h-marche" placeholder="ex : fibre / box + mobile / mobile..." />
     </div>
   </div>
   <div class="action-bar">
-    <button class="btn-generate" style="background:#15803d;border-color:#15803d" onclick="generate('opps')">Générer le prompt →</button>
-    <button class="btn-copy" id="copy-opps" onclick="copyPrompt('opps')">Copier le prompt</button>
+    <button class="btn-generate" style="background:#b45309;border-color:#b45309" onclick="generate('hebdo')">Générer le prompt →</button>
+    <button class="btn-copy" id="copy-hebdo" onclick="copyPrompt('hebdo')">Copier le prompt</button>
   </div>
-  <div class="output-label" id="label-opps">Prompt généré — prêt à coller dans Claude</div>
-  <pre class="output-box" id="out-opps"></pre>
+  <div class="output-label" id="label-hebdo">Prompt généré — prêt à coller dans Claude</div>
+  <pre class="output-box" id="out-hebdo"></pre>
+</div>
+
+<!-- SUIVI OPTIMISATIONS -->
+<div class="panel" id="panel-optims">
+  <div class="context-banner banner-optims">Export Ahrefs Organic Keywords optionnel mais recommandé · Sinon, données récupérées automatiquement via le connecteur Ahrefs (à tester)</div>
+  <div class="form-grid">
+    <div class="field">
+      <label class="field-label">Site</label>
+      <input type="text" id="x-site" placeholder="ex : selectra.info" />
+    </div>
+    <div class="field">
+      <label class="field-label">Langue de sortie</label>
+      <select id="x-lang">
+        <option value="Français">Français</option>
+        <option value="Anglais">Anglais</option>
+      </select>
+    </div>
+    <div class="field field-full">
+      <label class="field-label">URLs des pages récemment optimisées / créées *</label>
+      <textarea id="x-urls" placeholder="Une URL par ligne :
+https://lafibreoptique.fr/guide/installer-la-fibre/
+https://lafibreoptique.fr/offre-fibre/orange/
+https://lafibreoptique.fr/comparatif-box/" style="min-height:100px"></textarea>
+      <div class="export-hint">Ces URLs seront interrogées une par une via le connecteur Ahrefs ou l'export fourni selon la méthode choisie.</div>
+    </div>
+    <div class="field field-full">
+      <label class="field-label">Mots-clés "Top Priorité" — optionnel</label>
+      <textarea id="x-kw" placeholder="Mots-clés à inclure impérativement dans l'analyse (un par ligne) :
+meilleure box internet
+fibre orange avis
+installer fibre optique" style="min-height:80px"></textarea>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-generate" style="background:#7e22ce;border-color:#7e22ce" onclick="generate('optims')">Générer le prompt →</button>
+    <button class="btn-copy" id="copy-optims" onclick="copyPrompt('optims')">Copier le prompt</button>
+  </div>
+  <div class="output-label" id="label-optims">Prompt généré — prêt à coller dans Claude</div>
+  <pre class="output-box" id="out-optims"></pre>
 </div>
 
 <!-- ÉVOLUTIONS -->
@@ -354,49 +396,52 @@ OU ajoute le directement dans Claude."></textarea>
   <pre class="output-box" id="out-positions"></pre>
 </div>
 
-<!-- ANALYSE HEBDOMADAIRE -->
-<div class="panel active" id="panel-hebdo">
-  <div class="context-banner banner-hebdo">Export Ahrefs Organic Keywords requis · Génère un fichier Excel d'analyse par cluster</div>
+<!-- QUICK WINS -->
+<div class="panel" id="panel-opps">
+  <div class="context-banner banner-opps">Export GSC requis · Filtrer en amont : position 4–20, impressions &gt; 50, période 3 mois</div>
   <div class="form-grid">
     <div class="field">
       <label class="field-label">Site *</label>
-      <input type="text" id="h-site" placeholder="ex : selectra.info" />
+      <input type="text" id="o-site" placeholder="ex : selectra.info" />
     </div>
     <div class="field">
-      <label class="field-label">Langue de sortie</label>
-      <select id="h-lang">
-        <option value="français">Français</option>
-        <option value="anglais">Anglais</option>
-      </select>
+      <label class="field-label">Secteur</label>
+      <input type="text" id="o-sector" placeholder="ex : Telecom / Énergie / Finance..." />
     </div>
     <div class="field">
-      <label class="field-label">Périmètre *</label>
-      <input type="text" id="h-perimetre" placeholder="ex : provider / multi / répertoire précis..." />
+      <label class="field-label">Pays</label>
+      <input type="text" id="o-country" value="France" />
     </div>
     <div class="field">
-      <label class="field-label">Marché(s) analysé(s) *</label>
-      <input type="text" id="h-marche" placeholder="ex : fibre / box + mobile / mobile..." />
+      <label class="field-label">Fourchette de positions</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="o-pos-min" value="4" style="width:80px" />
+        <span style="color:#9ca3af;font-size:13px">→</span>
+        <input type="text" id="o-pos-max" value="20" style="width:80px" />
+      </div>
     </div>
     <div class="field field-full">
-      <label class="field-label">Export Ahrefs — Organic Keywords * <span class="badge-manual">export requis</span></label>
-      <textarea id="h-export" placeholder="Colle ici ton export CSV Ahrefs (colonnes attendues : Keyword, URL, Position, Volume, KD, Position change…)
+      <label class="field-label">Clusters prioritaires</label>
+      <input type="text" id="o-clusters" placeholder="ex : fibre, box 4G, offres internet, comparatif" />
+    </div>
+    <div class="field field-full">
+      <label class="field-label">Export GSC — Requêtes * <span class="badge-manual">export requis</span></label>
+      <textarea id="o-export-gsc" placeholder="Colle ici ton export GSC : requête, clics, impressions, CTR, position moyenne
 OU ajoute le directement dans Claude."></textarea>
-      <div class="export-hint">Ahrefs → Site Explorer → Organic Keywords<br>
-Colonnes obligatoires : Keyword, Volume, Previous position, Current position, Position change, Current URL<br>
-~ 500 lignes max.</div>
+      <div class="export-hint">GSC → Performance → Requêtes → Filtrer (position 4–20, impressions &gt; 50, 3 derniers mois)</div>
     </div>
   </div>
   <div class="action-bar">
-    <button class="btn-generate" style="background:#b45309;border-color:#b45309" onclick="generate('hebdo')">Générer le prompt →</button>
-    <button class="btn-copy" id="copy-hebdo" onclick="copyPrompt('hebdo')">Copier le prompt</button>
+    <button class="btn-generate" style="background:#15803d;border-color:#15803d" onclick="generate('opps')">Générer le prompt →</button>
+    <button class="btn-copy" id="copy-opps" onclick="copyPrompt('opps')">Copier le prompt</button>
   </div>
-  <div class="output-label" id="label-hebdo">Prompt généré — prêt à coller dans Claude</div>
-  <pre class="output-box" id="out-hebdo"></pre>
+  <div class="output-label" id="label-opps">Prompt généré — prêt à coller dans Claude</div>
+  <pre class="output-box" id="out-opps"></pre>
 </div>
 
 <script>
-const tabIds    = ['hebdo', 'positions', 'opps'];
-const tabColors = { opps: 'active-opps', positions: 'active-positions', hebdo: 'active-hebdo' };
+const tabIds    = ['hebdo', 'optims', 'positions', 'opps'];
+const tabColors = { hebdo: 'active-hebdo', optims: 'active-optims', positions: 'active-positions', opps: 'active-opps' };
 
 function switchTab(id) {
   tabIds.forEach((t, i) => {
@@ -445,8 +490,133 @@ function v(id) { return (document.getElementById(id)?.value || '').trim(); }
 function generate(type) {
   let prompt = '';
 
-  if (type === 'opps') {
-    const site = v('o-site') || '[NOM DU SITE]';
+  if (type === 'hebdo') {
+  const site      = v('h-site') || '[NOM DU SITE]';
+  const lang      = v('h-lang') || 'français';
+  const perimetre = v('h-perimetre') || '[à préciser]';
+  const marche    = v('h-marche') || '[à préciser]';
+  const today     = new Date();
+  const dateStr   = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
+
+  prompt =
+`Tu es un analyste SEO expert en interprétation de données de positionnement.
+Utilise le connecteur Ahrefs pour récupérer les données du site ${site} (Site Explorer → Organic Keywords). Génère le fichier Excel d'analyse hebdomadaire selon les instructions ci-dessous.
+
+CHAMPS DE CONTEXTE
+Site                  : ${site}
+Périmètre             : ${perimetre}
+Marché(s) analysé(s)  : ${marche}
+Langue de sortie      : ${lang}
+
+STRUCTURE DU FICHIER
+Deux onglets : "Analyse Mots-Clés S-1" et "Synthèse".
+
+ONGLET ANALYSE
+Tableau avec les colonnes : Catégorie / Pos. moy. / Pos. moy. S-1 / Keyword / Volume / KD / Pos. actuelle / Variation / URL.
+
+Identifie les clusters à partir des URLs en regroupant les mots-clés par répertoire (ex : /guide/, /installation/, /comparer-les-offres/, /offre-fibre/orange/, etc.).
+Crée un cluster par répertoire principal, nomme-le de façon lisible, et sélectionne ~10 MC parmi les plus pertinents (volume + KD + pertinence thématique).
+Si deux répertoires sont très proches thématiquement et peu fournis, tu peux les fusionner en un seul cluster.
+
+Pour la colonne "Pos. actuelle" : indique toujours la position numérique, y compris pour les nouveaux mots-clés.
+Pour la colonne "Variation" :
+- ▲ +X (vert) / ▼ -X (rouge) pour les variations
+- "New" (vert) pour les nouveaux MC sans historique
+- "Lost" (rouge) pour les MC perdus
+
+La position moyenne par cluster (colonne "Pos. moy.") se calcule sur les ~10 MC sélectionnés à partir de leur position actuelle.
+La colonne "Pos. moy. S-1" correspond à la position de la semaine précédente, récupérée via le connecteur (champ "previous_position").
+
+ONGLET SYNTHÈSE
+Analyse courte en 4 blocs :
+🟢 Points positifs
+🔴 Points de vigilance
+📊 Tendances par cluster
+💡 Actions recommandées
+Rédigée en ${lang}.
+
+RAPPEL TECHNIQUE
+- Récupère les données via le connecteur Ahrefs : Site Explorer → Organic Keywords, mode subdomains, pays FR
+- Utilise le champ "position" pour la Pos. actuelle et "position_compared_to" ou "previous_position" pour la Pos. S-1
+- Nom du fichier de sortie : analyse_keywords_${site}_${dateStr}.xlsx`;
+}
+
+  else if (type === 'optims') {
+    const site    = v('x-site') || '[NOM DU SITE]';
+    const lang    = v('x-lang') || 'Français';
+    const urls    = v('x-urls') || '[liste des URLs à surveiller]';
+    const kws     = v('x-kw');
+    const today   = new Date();
+    const dateStr = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
+
+    prompt =
+`Tu es un analyste SEO expert en interprétation de données et Data Visualization.
+Utilise le connecteur Ahrefs pour le site ${site}. Ton objectif est de générer un fichier Excel d'analyse hebdomadaire en te concentrant sur les récentes optimisations.
+
+CONTEXTE ET CIBLAGE
+URLs stratégiques à surveiller (pages récemment optimisées ou créées) :
+${urls}
+${kws ? '\nMots-clés "Top Priorité" (à inclure impérativement dans l\'analyse) :\n' + kws : ''}
+
+STRUCTURE DU FICHIER EXCEL
+Génère un fichier nommé : analyse_seo_optims_${site}_${dateStr}.xlsx
+Deux onglets :
+
+ONGLET 1 : "Analyse Mots-Clés S-1"
+Tableau avec les colonnes : URL / Keyword / Volume / KD / Pos. S-1 / Pos. Actuelle / Variation
+- Logique de tri : regroupe par URL
+- Variation : ▲ +X (vert) / ▼ -X (rouge) / "New" (vert) / "Lost" (rouge)
+- Sélection : affiche en priorité les mots-clés "Top Priorité" listés ci-dessus s'ils sont présents, complétés par les meilleurs MC pour atteindre ~10 MC par URL
+
+ONGLET 2 : "Synthèse & KPI"
+Résumé analytique structuré en 4 blocs :
+🟢 Performances : quelles optimisations portent leurs fruits ?
+🔴 Alertes : pertes de positions sur les mots-clés à fort volume
+📊 KPI par URL : position moyenne actuelle vs S-1 pour chaque URL stratégique
+💡 Next Steps : recommandations concrètes (maillage interne, mise à jour contenu, etc.)
+Rédigé en ${lang}.
+
+RAPPEL TECHNIQUE
+- Utilise la colonne "Previous position" pour la Pos. S-1
+- Utilise la colonne "Position" pour la Pos. Actuelle
+- Si un export Ahrefs a été joint en PDF dans cette conversation, utilise-le en priorité. Sinon, récupère les données via le connecteur.`;
+  }
+
+  else if (type === 'positions') {
+    const hypotheses = getChecked('p-hypotheses');
+    const exportGSC  = v('p-export-gsc');
+    const threshold  = v('p-threshold') || '±3 positions';
+    prompt =
+`Tu es un analyste SEO expert en interprétation de données de positionnement.
+
+CONTEXTE
+Site     : ${v('p-site') || '[NOM DU SITE]'}
+Marché   : ${v('p-country') || 'France'}
+Période A (référence) : ${v('p-date-a1') || '[date début]'} → ${v('p-date-a2') || '[date fin]'}
+Période B (récente)   : ${v('p-date-b1') || '[date début]'} → ${v('p-date-b2') || '[date fin]'}
+Seuil de variation    : ${threshold}
+
+NOTE : Les données de positionnement sont récupérées automatiquement depuis le Rank Tracker Ahrefs.
+
+MISSION — 3 sections :
+
+SECTION 1 — GAINS NOTABLES
+Mots-clés ayant progressé de ${threshold} ou plus, triés par volume décroissant.
+Colonnes : Mot-clé | Volume | Position A | Position B | Delta | URL
+
+SECTION 2 — CHUTES SIGNIFICATIVES
+Mots-clés ayant perdu ${threshold} ou plus.
+Pour chaque chute, propose une hypothèse parmi :
+${hypotheses.map(h => '- ' + h).join('\n')}
+Colonnes : Mot-clé | Volume | Position A | Position B | Delta | URL | Hypothèse
+
+SECTION 3 — TENDANCES GÉNÉRALES
+Résumé de 5 à 8 lignes : clusters qui progressent / régressent, visibilité globale, points d'attention prioritaires.
+${exportGSC ? '\n─── EXPORT GSC COMPARATIF ───\n' + exportGSC : ''}`;
+  }
+
+  else if (type === 'opps') {
+    const site      = v('o-site') || '[NOM DU SITE]';
     const sector    = v('o-sector') || '[secteur]';
     const country   = v('o-country') || 'France';
     const posMin    = v('o-pos-min') || '4';
@@ -489,94 +659,6 @@ Puis un encadré "Top 5 actions immédiates" avec les 5 quick wins les plus impa
 
 ─── EXPORT GSC — REQUÊTES ───
 ${exportGSC || '[colle ici : GSC → Performance → Requêtes → Télécharger]'}`;
-  }
-
-  else if (type === 'positions') {
-    const hypotheses = getChecked('p-hypotheses');
-    const exportGSC  = v('p-export-gsc');
-    const threshold  = v('p-threshold') || '±3 positions';
-    prompt =
-`Tu es un analyste SEO expert en interprétation de données de positionnement.
-
-CONTEXTE
-Site     : ${v('p-site') || '[NOM DU SITE]'}
-Marché   : ${v('p-country') || 'France'}
-Période A (référence) : ${v('p-date-a1') || '[date début]'} → ${v('p-date-a2') || '[date fin]'}
-Période B (récente)   : ${v('p-date-b1') || '[date début]'} → ${v('p-date-b2') || '[date fin]'}
-Seuil de variation    : ${threshold}
-
-NOTE : Les données de positionnement sont récupérées automatiquement depuis le Rank Tracker Ahrefs.
-
-MISSION — 3 sections :
-
-SECTION 1 — GAINS NOTABLES
-Mots-clés ayant progressé de ${threshold} ou plus, triés par volume décroissant.
-Colonnes : Mot-clé | Volume | Position A | Position B | Delta | URL
-
-SECTION 2 — CHUTES SIGNIFICATIVES
-Mots-clés ayant perdu ${threshold} ou plus.
-Pour chaque chute, propose une hypothèse parmi :
-${hypotheses.map(h => '- ' + h).join('\n')}
-Colonnes : Mot-clé | Volume | Position A | Position B | Delta | URL | Hypothèse
-
-SECTION 3 — TENDANCES GÉNÉRALES
-Résumé de 5 à 8 lignes : clusters qui progressent / régressent, visibilité globale, points d'attention prioritaires.
-${exportGSC ? '\n─── EXPORT GSC COMPARATIF ───\n' + exportGSC : ''}`;
-  }
-
-  else if (type === 'hebdo') {
-    const site = v('h-site') || '[NOM DU SITE]';
-    const lang       = v('h-lang') || 'français';
-    const perimetre  = v('h-perimetre') || '[à préciser]';
-    const marche     = v('h-marche') || '[à préciser]';
-    const exportData = v('h-export');
-    const today      = new Date();
-    const dateStr    = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
-
-    prompt =
-`Tu es un analyste SEO expert en interprétation de données de positionnement.
-Je te joins un export Ahrefs pour ${site}. Génère le fichier Excel d'analyse hebdomadaire selon les instructions ci-dessous.
-
-CHAMPS DE CONTEXTE
-Site                  : ${site}
-Périmètre             : ${perimetre}
-Marché(s) analysé(s)  : ${marche}
-Langue de sortie      : ${lang}
-
-STRUCTURE DU FICHIER
-Deux onglets : "Analyse Mots-Clés S-1" et "Synthèse".
-
-ONGLET ANALYSE
-Tableau avec les colonnes : Catégorie / Pos. moy. / Pos. moy. S-1 / Keyword / Volume / KD / Pos. actuelle / Variation / URL.
-
-Identifie les clusters à partir des URLs présentes dans l'export en regroupant les mots-clés par répertoire (ex : /guide/, /installation/, /comparer-les-offres/, /offre-fibre/orange/, etc.).
-Crée un cluster par répertoire principal, nomme-le de façon lisible, et sélectionne ~10 MC parmi les plus pertinents (volume + KD + pertinence thématique).
-Si deux répertoires sont très proches thématiquement et peu fournis, tu peux les fusionner en un seul cluster.
-
-Pour la colonne "Pos. actuelle" : indique toujours la position numérique, y compris pour les nouveaux mots-clés.
-Pour la colonne "Variation" :
-- ▲ +X (vert) / ▼ -X (rouge) pour les variations
-- "New" (vert) pour les nouveaux MC sans historique
-- "Lost" (rouge) pour les MC perdus
-
-La position moyenne par cluster (colonne "Pos. moy.") se calcule sur les ~10 MC sélectionnés à partir de leur position actuelle.
-La colonne "Pos. moy. S-1" est la moyenne des positions S-1 de ces mêmes MC, lue directement depuis la colonne "Previous position" de l'export.
-
-ONGLET SYNTHÈSE
-Analyse courte en 4 blocs :
-🟢 Points positifs
-🔴 Points de vigilance
-📊 Tendances par cluster
-💡 Actions recommandées
-Rédigée en ${lang}.
-
-RAPPEL TECHNIQUE
-- Export Ahrefs = positions du jour vs S-1
-- La colonne "Position change" = évolution vs S-1
-- Nom du fichier de sortie : analyse_keywords_${site}_${dateStr}.xlsx
-
-─── EXPORT AHREFS — ORGANIC KEYWORDS ───
-${exportData || '[colle ici : Ahrefs → Site Explorer → Organic Keywords → Export CSV]'}`;
   }
 
   document.getElementById('out-' + type).textContent = prompt;
