@@ -540,27 +540,47 @@ function generate(type) {
 
     // Construire le bloc filtres dynamiquement
     const filtres = [];
+    const whereConditions = [];
 
     if (urlInclude) {
       const segs = urlInclude.split(',').map(s => s.trim()).filter(Boolean);
-      filtres.push(`• URL contient : conserver uniquement les résultats dont best_position_url contient ${segs.map(s => '"'+s+'"').join(' OU ')}`);
+      filtres.push(`• URL contient : ${segs.map(s => '"'+s+'"').join(' OU ')}`);
+      if (segs.length === 1) {
+        whereConditions.push(`{"field":"best_position_url","is":["isubstring","${segs[0]}"]}`);
+      } else {
+        whereConditions.push(`{"or":[${segs.map(s => `{"field":"best_position_url","is":["isubstring","${s}"]}`).join(',')}]}`);
+      }
     }
     if (urlExclude) {
       const segs = urlExclude.split(',').map(s => s.trim()).filter(Boolean);
-      filtres.push(`• URL exclut : éliminer les résultats dont best_position_url contient ${segs.map(s => '"'+s+'"').join(' OU ')}`);
+      filtres.push(`• URL exclut : ${segs.map(s => '"'+s+'"').join(' ET ')}`);
+      segs.forEach(s => whereConditions.push(`{"not":{"field":"best_position_url","is":["isubstring","${s}"]}}`));
     }
     if (kwInclude) {
       const terms = kwInclude.split(',').map(s => s.trim()).filter(Boolean);
-      filtres.push(`• Keyword contient : conserver uniquement les MC dont le keyword contient ${terms.map(s => '"'+s+'"').join(' OU ')} (filtre : keyword isubstring)`);
+      filtres.push(`• Keyword contient : ${terms.map(s => '"'+s+'"').join(' OU ')}`);
+      if (terms.length === 1) {
+        whereConditions.push(`{"field":"keyword","is":["isubstring","${terms[0]}"]}`);
+      } else {
+        whereConditions.push(`{"or":[${terms.map(t => `{"field":"keyword","is":["isubstring","${t}"]}`).join(',')}]}`);
+      }
     }
     if (branded === 'branded') {
-      filtres.push(`• Mots-clés brandés uniquement : appliquer is_branded=true`);
+      filtres.push(`• Brandés uniquement : is_branded=true`);
+      whereConditions.push(`{"field":"is_branded","is":["eq",true]}`);
     } else if (branded === 'nonbranded') {
-      filtres.push(`• Mots-clés non-brandés uniquement : appliquer is_branded=false`);
+      filtres.push(`• Non-brandés uniquement : is_branded=false`);
+      whereConditions.push(`{"field":"is_branded","is":["eq",false]}`);
     }
 
+    const whereClause = whereConditions.length > 0
+      ? (whereConditions.length === 1
+          ? whereConditions[0]
+          : `{"and":[${whereConditions.join(',')}]}`)
+      : null;
+
     const filtresBlock = filtres.length > 0
-      ? `\nFILTRES DE PÉRIMÈTRE\nApplique ces filtres lors de l'appel au connecteur Ahrefs :\n${filtres.join('\n')}\n`
+      ? `\nFILTRES DE PÉRIMÈTRE\nApplique ces filtres via le paramètre where du connecteur :\n${filtres.join('\n')}\nParamètre where à utiliser : ${whereClause}\n`
       : '';
 
     prompt =
@@ -603,9 +623,17 @@ Analyse courte en 4 blocs :
 Rédigée en ${lang}.
 
 RAPPEL TECHNIQUE
-- Récupère les données via le connecteur Ahrefs : Site Explorer → Organic Keywords, mode subdomains, pays FR
-- Paramètres obligatoires : target="${site}", date="${dateApi}", date_compared="${dateS1Api}", country="FR"
-- Champs à utiliser : best_position (pos. actuelle), best_position_prev (pos. S-1), best_position_diff (variation)
+- Récupère les données via le connecteur Ahrefs : site-explorer-organic-keywords
+- Paramètres obligatoires :
+  · target = "https://www.${site}/" (URL complète avec slash final)
+  · mode = "prefix"
+  · country = "FR"
+  · date = "${dateApi}"
+  · date_compared = "${dateS1Api}"
+  · order_by = "volume:desc"
+  · limit = 1000${whereClause ? `\n  · where = ${whereClause}` : ''}
+- Champs à sélectionner (select) : keyword, best_position, best_position_prev, best_position_diff, volume, keyword_difficulty, best_position_url, is_branded
+- Champs à utiliser : best_position (pos. actuelle), best_position_prev (pos. S-1), best_position_diff (variation — négatif = gain, positif = perte)
 - Nom du fichier de sortie : analyse_keywords_${site}_${dateStr}.xlsx`;
   }
 
