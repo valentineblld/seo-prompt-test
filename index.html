@@ -4,671 +4,369 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Selectra – Générateur de Prompts SEO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Bricolage+Grotesque:wght@400;600;700;800&display=swap');
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: #f9fafb;
-  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
-  min-height: 100vh;
-  color: #111827;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue:#015AA3; --blue-dark:#01478A; --blue-light:#E8F1FB; --blue-mid:#C2D9F0;
+  --white:#FFFFFF; --bg:#F5F7FA; --border:#DDE3EC;
+  --text:#1A2333; --text-mid:#4A5568; --muted:#8A97A8;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 16px rgba(1,90,163,.10),0 1px 4px rgba(0,0,0,.06);
+  --radius:10px;
+  --c-hebdo:#D97706; --c-optims:#6D28D9; --c-positions:#015AA3; --c-opps:#047857;
 }
-header {
-  background: #111827;
-  padding: 28px 36px 24px;
-  border-bottom: 1px solid #1f2937;
-}
-.header-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  letter-spacing: .15em;
-  text-transform: uppercase;
-  color: #6b7280;
-  margin-bottom: 6px;
-}
-header h1 {
-  font-size: 28px;
-  font-weight: 800;
-  color: #f9fafb;
-  letter-spacing: -0.02em;
-}
-.header-sources {
-  margin-top: 10px;
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.source-badge {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-.dot-green { background: #4ade80; }
-.dot-red { background: #f87171; }
-.tabs {
-  display: flex;
-  background: #fff;
-  border-bottom: 2px solid #e5e7eb;
-  overflow-x: auto;
-}
-.tab {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  padding: 14px 28px;
-  border: none;
-  border-bottom: 3px solid transparent;
-  background: transparent;
-  color: #6b7280;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .15s;
-  margin-bottom: -2px;
-}
-.tab:hover { color: #111827; }
-.tab.active-opps      { color: #15803d; border-bottom-color: #15803d; font-weight: 600; }
-.tab.active-positions { color: #1d4ed8; border-bottom-color: #1d4ed8; font-weight: 600; }
-.tab.active-hebdo     { color: #b45309; border-bottom-color: #b45309; font-weight: 600; }
-.tab.active-optims    { color: #7e22ce; border-bottom-color: #7e22ce; font-weight: 600; }
-.panel { display: none; max-width: 900px; margin: 0 auto; padding: 32px 28px 60px; }
-.panel.active { display: block; }
-.context-banner {
-  border-radius: 8px;
-  padding: 10px 16px;
-  margin-bottom: 24px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-}
-.banner-opps      { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
-.banner-positions { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
-.banner-hebdo     { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; }
-.banner-optims    { background: #faf5ff; border: 1px solid #e9d5ff; color: #7e22ce; }
-.field-section {
-  grid-column: 1 / -1;
-  border-top: 1px dashed #e5e7eb;
-  padding-top: 4px;
-  margin-top: 4px;
-}
-.field-section-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #d1d5db;
-  margin-bottom: 14px;
-}
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin-bottom: 18px;
-}
-.field-full { grid-column: 1 / -1; }
-.field { display: flex; flex-direction: column; gap: 6px; }
-label.field-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: #9ca3af;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.badge-manual {
-  font-size: 9px; padding: 1px 7px; border-radius: 3px;
-  background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;
-  letter-spacing: .05em; text-transform: uppercase;
-}
-.badge-auto {
-  font-size: 9px; padding: 1px 7px; border-radius: 3px;
-  background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
-  letter-spacing: .05em; text-transform: uppercase;
-}
-.badge-opt {
-  font-size: 9px; padding: 1px 7px; border-radius: 3px;
-  background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb;
-  letter-spacing: .05em; text-transform: uppercase;
-}
-input[type="text"], input[type="date"], select, textarea {
-  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
-  font-size: 13px;
-  color: #111827;
-  background: #fff;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  padding: 9px 12px;
-  outline: none;
-  width: 100%;
-  transition: border-color .15s;
-}
-input:focus, select:focus, textarea:focus { border-color: #6b7280; }
-input::placeholder, textarea::placeholder { color: #9ca3af; }
-textarea {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  line-height: 1.7;
-  resize: vertical;
-  min-height: 110px;
-}
-.export-hint {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  color: #9ca3af;
-  background: #f9fafb;
-  border: 1px dashed #d1d5db;
-  border-radius: 4px;
-  padding: 8px 10px;
-  line-height: 1.6;
-}
-.pills { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 2px; }
-.pill {
-  padding: 5px 12px;
-  border-radius: 20px;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  color: #6b7280;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  cursor: pointer;
-  transition: all .15s;
-  user-select: none;
-}
-.pill:hover { border-color: #6b7280; color: #111827; }
-.action-bar {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding-top: 8px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-.btn-generate {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  padding: 11px 24px;
-  border-radius: 6px;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: all .15s;
-  color: #fff;
-}
-.btn-copy {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  padding: 11px 24px;
-  border: 2px solid #d1d5db;
-  border-radius: 6px;
-  background: #fff;
-  color: #374151;
-  cursor: pointer;
-  transition: all .15s;
-  display: none;
-}
-.btn-copy:hover { border-color: #374151; }
-.btn-copy.visible { display: inline-block; }
-.btn-copy.success { background: #15803d; border-color: #15803d; color: #fff; }
-.output-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: #9ca3af;
-  margin-bottom: 10px;
-  display: none;
-}
-.output-label.visible { display: block; }
-.output-box {
-  background: #111827;
-  color: #d1d5db;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  line-height: 1.8;
-  padding: 20px;
-  border-radius: 8px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 420px;
-  overflow-y: auto;
-  display: none;
-}
-.output-box.visible { display: block; }
-.output-box::-webkit-scrollbar { width: 4px; }
-.output-box::-webkit-scrollbar-thumb { background: #374151; border-radius: 2px; }
-@media(max-width: 600px) {
-  header, .panel { padding-left: 18px; padding-right: 18px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .tab { padding: 12px 16px; font-size: 11px; }
-}
+body { font-family:'Nunito',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; font-size:14px; -webkit-font-smoothing:antialiased; }
+
+/* HEADER */
+header { background:var(--white); border-bottom:1px solid var(--border); padding:0 40px; display:flex; align-items:center; height:64px; gap:24px; box-shadow:var(--shadow-sm); position:sticky; top:0; z-index:100; }
+.logo { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
+.logo-icon { width:34px; height:34px; flex-shrink:0; }
+.logo-name { font-weight:800; font-size:20px; color:var(--blue); letter-spacing:-0.02em; line-height:1; }
+.header-sep { width:1px; height:28px; background:var(--border); flex-shrink:0; }
+.header-tool { display:flex; flex-direction:column; gap:2px; }
+.header-tool-name { font-weight:700; font-size:15px; color:var(--text); letter-spacing:-0.01em; }
+.header-tool-sub { font-size:11.5px; color:var(--muted); font-weight:500; }
+.header-right { margin-left:auto; display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.status-pill { display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; font-size:11.5px; font-weight:600; border:1px solid; white-space:nowrap; }
+.status-pill.green { background:#F0FDF4; border-color:#BBF7D0; color:#166534; }
+.status-pill.red   { background:#FFF1F0; border-color:#FFC9C5; color:#9B1C1C; }
+.sdot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.sdot.green { background:#22C55E; }
+.sdot.red   { background:#EF4444; }
+
+/* TABS */
+.tabs-wrap { background:var(--white); border-bottom:1px solid var(--border); padding:0 40px; display:flex; align-items:flex-end; }
+.tab-btn { font-family:'Nunito',sans-serif; font-size:13.5px; font-weight:700; padding:14px 18px 13px; border:none; border-bottom:3px solid transparent; background:transparent; color:var(--muted); cursor:pointer; white-space:nowrap; transition:color .15s,border-color .15s; display:flex; align-items:center; gap:7px; margin-bottom:-1px; }
+.tab-btn:hover { color:var(--text); }
+.tab-emoji { font-size:14px; line-height:1; }
+.tab-btn.t-hebdo.active     { color:var(--c-hebdo);     border-bottom-color:var(--c-hebdo); }
+.tab-btn.t-optims.active    { color:var(--c-optims);    border-bottom-color:var(--c-optims); }
+.tab-btn.t-positions.active { color:var(--c-positions); border-bottom-color:var(--c-positions); }
+.tab-btn.t-opps.active      { color:var(--c-opps);      border-bottom-color:var(--c-opps); }
+
+/* PANELS */
+.panel { display:none; }
+.panel.active { display:block; }
+.panel-inner { max-width:820px; margin:0 auto; padding:32px 40px 72px; }
+
+/* NOTICE */
+.notice { display:flex; align-items:flex-start; gap:10px; padding:12px 16px; border-radius:8px; margin-bottom:20px; font-size:12.5px; font-weight:600; line-height:1.5; border-left:3px solid; }
+.notice-icon { font-size:14px; flex-shrink:0; margin-top:1px; }
+.n-amber  { background:#FFFBEB; border-left-color:var(--c-hebdo);     color:#92400E; }
+.n-violet { background:#F5F3FF; border-left-color:var(--c-optims);    color:#4C1D95; }
+.n-blue   { background:var(--blue-light); border-left-color:var(--blue); color:#073B6F; }
+.n-green  { background:#ECFDF5; border-left-color:var(--c-opps);      color:#064E3B; }
+
+/* CARD */
+.card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:26px 26px 22px; box-shadow:var(--shadow-sm); }
+.card+.card { margin-top:14px; }
+.card-header { display:flex; align-items:center; gap:10px; padding-bottom:20px; border-bottom:1px solid var(--border); margin-bottom:20px; }
+.card-icon { width:32px; height:32px; border-radius:7px; display:grid; place-items:center; font-size:15px; flex-shrink:0; }
+.card-title { font-size:14.5px; font-weight:800; color:var(--text); letter-spacing:-0.01em; }
+.card-desc  { font-size:12px; color:var(--muted); font-weight:500; margin-top:1px; }
+
+/* FORM */
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.field-full { grid-column:1/-1; }
+.field { display:flex; flex-direction:column; gap:6px; }
+.field-label { font-size:12px; font-weight:700; color:var(--text-mid); display:flex; align-items:center; gap:7px; }
+.req { color:var(--blue); font-size:13px; }
+.badge { font-size:10px; padding:2px 7px; border-radius:4px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+.badge-manual { background:#FEE2E2; color:#991B1B; border:1px solid #FECACA; }
+.badge-auto   { background:#DCFCE7; color:#166534; border:1px solid #BBF7D0; }
+input[type="text"],input[type="date"],select,textarea { font-family:'Nunito',system-ui,sans-serif; font-size:13.5px; font-weight:500; color:var(--text); background:var(--white); border:1.5px solid var(--border); border-radius:8px; padding:9px 13px; outline:none; width:100%; transition:border-color .15s,box-shadow .15s; line-height:1.4; }
+input:hover,select:hover,textarea:hover { border-color:#B3C5D9; }
+input:focus,select:focus,textarea:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(1,90,163,.12); }
+input::placeholder,textarea::placeholder { color:#B8C4CF; font-weight:400; }
+textarea { font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:1.75; resize:vertical; min-height:112px; }
+.hint { font-size:11.5px; color:var(--muted); font-weight:500; background:var(--bg); border:1px dashed var(--border); border-radius:6px; padding:8px 12px; line-height:1.6; margin-top:2px; }
+.inline-pair { display:flex; gap:8px; align-items:center; }
+.inline-pair input { flex:1; }
+.inline-sep { color:var(--muted); font-weight:700; font-size:14px; flex-shrink:0; }
+
+/* PILLS */
+.pills { display:flex; flex-wrap:wrap; gap:7px; padding-top:2px; }
+.pill { padding:5px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--white); color:var(--text-mid); font-family:'Nunito',sans-serif; font-size:12.5px; font-weight:600; cursor:pointer; transition:all .15s; user-select:none; }
+.pill:hover { border-color:var(--blue); color:var(--blue); }
+
+/* FOOTER */
+.card-footer { display:flex; align-items:center; gap:12px; padding-top:22px; border-top:1px solid var(--border); margin-top:22px; flex-wrap:wrap; }
+.btn-generate { font-family:'Nunito',sans-serif; font-size:13.5px; font-weight:800; padding:10px 26px; border-radius:8px; border:none; cursor:pointer; color:var(--white); display:flex; align-items:center; gap:8px; transition:background .15s,box-shadow .15s,transform .1s; letter-spacing:-0.01em; }
+.btn-generate:hover { transform:translateY(-1px); }
+.btn-generate:active { transform:translateY(0); }
+.g-hebdo     { background:var(--c-hebdo); }
+.g-hebdo:hover { background:#B45309; box-shadow:0 4px 14px rgba(180,83,9,.3); }
+.g-optims    { background:var(--c-optims); }
+.g-optims:hover { background:#5B21B6; box-shadow:0 4px 14px rgba(109,40,217,.3); }
+.g-positions { background:var(--blue); }
+.g-positions:hover { background:var(--blue-dark); box-shadow:0 4px 14px rgba(1,90,163,.35); }
+.g-opps      { background:var(--c-opps); }
+.g-opps:hover { background:#065F46; box-shadow:0 4px 14px rgba(4,120,87,.3); }
+.btn-copy { font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; padding:10px 22px; border:1.5px solid var(--border); border-radius:8px; background:var(--white); color:var(--text-mid); cursor:pointer; transition:all .15s; display:none; align-items:center; gap:7px; }
+.btn-copy.visible { display:inline-flex; }
+.btn-copy:hover { border-color:var(--text-mid); color:var(--text); }
+.btn-copy.success { background:var(--c-opps); border-color:var(--c-opps); color:#fff; }
+
+/* OUTPUT */
+.output-card { background:#1A2436; border-radius:var(--radius); margin-top:14px; overflow:hidden; display:none; box-shadow:var(--shadow-md); }
+.output-card.visible { display:block; }
+.output-topbar { display:flex; align-items:center; justify-content:space-between; padding:11px 20px; background:#222E42; border-bottom:1px solid #2E3D54; }
+.output-label { font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#8DA3BE; }
+.wdots { display:flex; gap:5px; }
+.wdots span { width:10px; height:10px; border-radius:50%; display:block; }
+pre.output-box { color:#C8D8E8; font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:1.85; padding:24px 28px; white-space:pre-wrap; word-break:break-word; max-height:460px; overflow-y:auto; margin:0; }
+pre.output-box::-webkit-scrollbar { width:5px; }
+pre.output-box::-webkit-scrollbar-thumb { background:#2E3D54; border-radius:3px; }
 </style>
 </head>
 <body>
+
 <header>
-  <div class="header-eyebrow">Selectra · Content France · SEO Toolkit</div>
-  <h1>Générateur de Prompts – Audit des Mots-clés & Positions</h1>
-  <div class="header-sources">
-    <span class="source-badge"><span class="dot dot-green"></span><span style="color:#4ade80">Ahrefs connecté — données automatiques (Rank Tracker + Site Explorer)</span></span>
-    <span class="source-badge"><span class="dot dot-red"></span><span style="color:#f87171">Export GSC — requis manuellement (Quick Wins)</span></span>
+  <a class="logo" href="#">
+    <svg class="logo-icon" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="34" height="34" rx="7" fill="#015AA3"/>
+      <path d="M17 8L7 16.5V27h7v-6h6v6h7V16.5L17 8Z" fill="white"/>
+    </svg>
+    <span class="logo-name">Selectra</span>
+  </a>
+  <div class="header-sep"></div>
+  <div class="header-tool">
+    <div class="header-tool-name">Générateur de Prompts SEO</div>
+    <div class="header-tool-sub">Content France · SEO Toolkit</div>
+  </div>
+  <div class="header-right">
+    <div class="status-pill green"><span class="sdot green"></span>Ahrefs Rank Tracker connecté</div>
+    <div class="status-pill red"><span class="sdot red"></span>Export GSC requis manuellement</div>
   </div>
 </header>
-<div class="tabs">
-  <button class="tab active-hebdo" onclick="switchTab('hebdo')">🟡 Analyse Hebdomadaire</button>
-  <button class="tab" onclick="switchTab('optims')">🟣 Suivi Optimisations</button>
-  <button class="tab" onclick="switchTab('positions')">🔵 Évolutions</button>
-  <button class="tab" onclick="switchTab('opps')">🟢 Quick Wins</button>
+
+<div class="tabs-wrap">
+  <button class="tab-btn t-hebdo active" onclick="switchTab('hebdo')"><span class="tab-emoji">📊</span>Analyse Hebdomadaire</button>
+  <button class="tab-btn t-optims" onclick="switchTab('optims')"><span class="tab-emoji">🔍</span>Suivi Optimisations</button>
+  <button class="tab-btn t-positions" onclick="switchTab('positions')"><span class="tab-emoji">📈</span>Évolutions</button>
+  <button class="tab-btn t-opps" onclick="switchTab('opps')"><span class="tab-emoji">⚡</span>Quick Wins</button>
 </div>
+
 <!-- ANALYSE HEBDOMADAIRE -->
 <div class="panel active" id="panel-hebdo">
-  <div class="context-banner banner-hebdo">✓ Données récupérées automatiquement via le connecteur Ahrefs · Génère un fichier Excel d'analyse par cluster</div>
-  <div class="form-grid">
-    <div class="field">
-      <label class="field-label">Site *</label>
-      <input type="text" id="h-site" placeholder="ex : selectra.info" />
+  <div class="panel-inner">
+    <div class="notice n-amber"><span class="notice-icon">📋</span>Export Ahrefs Organic Keywords requis · Génère un fichier Excel d'analyse par cluster</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#FEF3C7">📌</div>
+        <div><div class="card-title">Contexte</div><div class="card-desc">Paramètres de l'analyse</div></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label class="field-label">Site <span class="req">*</span></label><input type="text" id="h-site" placeholder="ex : selectra.info"/></div>
+        <div class="field"><label class="field-label">Langue de sortie</label><select id="h-lang"><option value="français">Français</option><option value="anglais">Anglais</option></select></div>
+        <div class="field"><label class="field-label">Périmètre <span class="req">*</span></label><input type="text" id="h-perimetre" placeholder="ex : provider / multi / répertoire précis…"/></div>
+        <div class="field"><label class="field-label">Marché(s) analysé(s) <span class="req">*</span></label><input type="text" id="h-marche" placeholder="ex : fibre / box + mobile / mobile…"/></div>
+      </div>
     </div>
-    <div class="field">
-      <label class="field-label">Langue de sortie</label>
-      <select id="h-lang">
-        <option value="français">Français</option>
-        <option value="anglais">Anglais</option>
-      </select>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#FEE2E2">📥</div>
+        <div><div class="card-title">Données d'entrée</div><div class="card-desc">Export à fournir pour générer l'analyse</div></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Export Ahrefs — Organic Keywords <span class="req">*</span><span class="badge badge-manual">export requis</span></label>
+        <textarea id="h-export" placeholder="Colle ici ton export CSV Ahrefs (colonnes attendues : Keyword, URL, Position, Volume, KD, Position change…)&#10;OU ajoute-le directement dans Claude."></textarea>
+        <div class="hint">Ahrefs → Site Explorer → Organic Keywords · Colonnes : Keyword · Volume · Previous position · Current position · Position change · Current URL · ~500 lignes max.</div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-generate g-hebdo" onclick="generate('hebdo')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Générer le prompt</button>
+        <button class="btn-copy" id="copy-hebdo" onclick="copyPrompt('hebdo')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="3.5" width="7.5" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 3.5V2.5A1.5 1.5 0 016 1h5a1.5 1.5 0 011.5 1.5V8A1.5 1.5 0 0111 9.5h-1" stroke="currentColor" stroke-width="1.4"/></svg>Copier le prompt</button>
+      </div>
     </div>
-    <div class="field">
-      <label class="field-label">Périmètre *</label>
-      <input type="text" id="h-perimetre" placeholder="ex : pages multi-opérateurs / provider / tous répertoires..." />
-    </div>
-    <div class="field">
-      <label class="field-label">Marché(s) analysé(s) *</label>
-      <input type="text" id="h-marche" placeholder="ex : fibre optique en france / box + mobile..." />
-    </div>
-    <div class="field field-full">
-      <label class="field-label">Filtres Ahrefs <span class="badge-opt">optionnel</span></label>
-      <textarea id="h-ahrefs-filters" placeholder="ex :
-- Récupère tous les mots-clés contenant &quot;fibre&quot; (non-brandés)
-- Limite à 500 résultats, triés par volume décroissant
-- Utilise mode=subdomains" style="min-height:90px"></textarea>
-      <div class="export-hint">Instructions spécifiques pour la récupération des données via Ahrefs (mode, limite, filtres, tri, etc.)</div>
-    </div>
-    <!-- Séparateur filtres -->
-    <div class="field-section">
-      <div class="field-section-label">Filtres de périmètre — optionnels (utiliser inclusion OU exclusion selon votre besoin)</div>
-    </div>
-    <div class="field field-full">
-      <label class="field-label">URL contient (inclusion) <span class="badge-opt">optionnel</span></label>
-      <input type="text" id="h-url-include" placeholder="ex : /guide/, /installation/, /comparer-les-offres/" />
-      <div class="export-hint">Restreint aux URLs contenant ces répertoires. Séparer par des virgules. Si rempli, seules ces URLs seront analysées.</div>
-    </div>
-    <div class="field field-full">
-      <label class="field-label">URL exclut (exclusion) <span class="badge-opt">optionnel</span></label>
-      <input type="text" id="h-url-exclude" placeholder="ex : /offre-fibre/orange/, /offre-fibre/free/, /offre-fibre/sfr/" />
-      <div class="export-hint">Exclut les URLs contenant ces chaînes (ex : toutes les pages mono-opérateur). Séparer par des virgules.</div>
+    <div class="output-card" id="wrap-hebdo">
+      <div class="output-topbar"><span class="output-label">Prompt généré — prêt à coller dans Claude</span><div class="wdots"><span style="background:#EF4444"></span><span style="background:#F59E0B"></span><span style="background:#22C55E"></span></div></div>
+      <pre class="output-box" id="out-hebdo"></pre>
     </div>
   </div>
-  <div class="action-bar">
-    <button class="btn-generate" style="background:#b45309;border-color:#b45309" onclick="generate('hebdo')">Générer le prompt →</button>
-    <button class="btn-copy" id="copy-hebdo" onclick="copyPrompt('hebdo')">Copier le prompt</button>
-  </div>
-  <div class="output-label" id="label-hebdo">Prompt généré — prêt à coller dans Claude</div>
-  <pre class="output-box" id="out-hebdo"></pre>
 </div>
+
 <!-- SUIVI OPTIMISATIONS -->
 <div class="panel" id="panel-optims">
-  <div class="context-banner banner-optims">Export Ahrefs Organic Keywords optionnel mais recommandé · Sinon, données récupérées automatiquement via le connecteur Ahrefs (à tester)</div>
-  <div class="form-grid">
-    <div class="field">
-      <label class="field-label">Site</label>
-      <input type="text" id="x-site" placeholder="ex : selectra.info" />
+  <div class="panel-inner">
+    <div class="notice n-violet"><span class="notice-icon">🔍</span>Export Ahrefs Organic Keywords requis · Analyse ciblée par URL optimisée</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#EDE9FE">📌</div>
+        <div><div class="card-title">Contexte</div><div class="card-desc">Paramètres de l'analyse</div></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label class="field-label">Site</label><input type="text" id="x-site" placeholder="ex : selectra.info"/></div>
+        <div class="field"><label class="field-label">Langue de sortie</label><select id="x-lang"><option value="Français">Français</option><option value="Anglais">Anglais</option></select></div>
+      </div>
     </div>
-    <div class="field">
-      <label class="field-label">Langue de sortie</label>
-      <select id="x-lang">
-        <option value="Français">Français</option>
-        <option value="Anglais">Anglais</option>
-      </select>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#EDE9FE">📥</div>
+        <div><div class="card-title">Données d'entrée</div></div>
+      </div>
+      <div class="form-grid">
+        <div class="field field-full">
+          <label class="field-label">URLs des pages récemment optimisées / créées <span class="req">*</span></label>
+          <textarea id="x-urls" placeholder="Une URL par ligne :&#10;https://lafibreoptique.fr/guide/installer-la-fibre/&#10;https://lafibreoptique.fr/offre-fibre/orange/" style="min-height:96px"></textarea>
+          <div class="hint">Ces URLs seront interrogées une par une via l'export fourni.</div>
+        </div>
+        <div class="field field-full">
+          <label class="field-label">Mots-clés "Top Priorité" — optionnel</label>
+          <textarea id="x-kw" placeholder="Un mot-clé par ligne :&#10;meilleure box internet&#10;fibre orange avis" style="min-height:80px"></textarea>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-generate g-optims" onclick="generate('optims')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Générer le prompt</button>
+        <button class="btn-copy" id="copy-optims" onclick="copyPrompt('optims')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="3.5" width="7.5" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 3.5V2.5A1.5 1.5 0 016 1h5a1.5 1.5 0 011.5 1.5V8A1.5 1.5 0 0111 9.5h-1" stroke="currentColor" stroke-width="1.4"/></svg>Copier le prompt</button>
+      </div>
     </div>
-    <div class="field field-full">
-      <label class="field-label">URLs des pages récemment optimisées / créées *</label>
-      <textarea id="x-urls" placeholder="Une URL par ligne :
-https://lafibreoptique.fr/guide/installer-la-fibre/
-https://lafibreoptique.fr/offre-fibre/orange/
-https://lafibreoptique.fr/comparatif-box/" style="min-height:100px"></textarea>
-      <div class="export-hint">Ces URLs seront interrogées une par une via le connecteur Ahrefs ou l'export fourni selon la méthode choisie.</div>
-    </div>
-    <div class="field field-full">
-      <label class="field-label">Mots-clés "Top Priorité" — optionnel</label>
-      <textarea id="x-kw" placeholder="Mots-clés à inclure impérativement dans l'analyse (un par ligne) :
-meilleure box internet
-fibre orange avis
-installer fibre optique" style="min-height:80px"></textarea>
+    <div class="output-card" id="wrap-optims">
+      <div class="output-topbar"><span class="output-label">Prompt généré — prêt à coller dans Claude</span><div class="wdots"><span style="background:#EF4444"></span><span style="background:#F59E0B"></span><span style="background:#22C55E"></span></div></div>
+      <pre class="output-box" id="out-optims"></pre>
     </div>
   </div>
-  <div class="action-bar">
-    <button class="btn-generate" style="background:#7e22ce;border-color:#7e22ce" onclick="generate('optims')">Générer le prompt →</button>
-    <button class="btn-copy" id="copy-optims" onclick="copyPrompt('optims')">Copier le prompt</button>
-  </div>
-  <div class="output-label" id="label-optims">Prompt généré — prêt à coller dans Claude</div>
-  <pre class="output-box" id="out-optims"></pre>
 </div>
+
 <!-- ÉVOLUTIONS -->
 <div class="panel" id="panel-positions">
-  <div class="context-banner banner-positions">✓ Données récupérées automatiquement via Ahrefs Rank Tracker · GSC optionnel</div>
-  <div class="form-grid">
-    <div class="field">
-      <label class="field-label">Site *</label>
-      <input type="text" id="p-site" placeholder="ex : selectra.info" />
-    </div>
-    <div class="field">
-      <label class="field-label">Pays</label>
-      <input type="text" id="p-country" value="France" />
-    </div>
-    <div class="field">
-      <label class="field-label">Période A — début *</label>
-      <input type="date" id="p-date-a1" />
-    </div>
-    <div class="field">
-      <label class="field-label">Période A — fin *</label>
-      <input type="date" id="p-date-a2" />
-    </div>
-    <div class="field">
-      <label class="field-label">Période B — début *</label>
-      <input type="date" id="p-date-b1" />
-    </div>
-    <div class="field">
-      <label class="field-label">Période B — fin *</label>
-      <input type="date" id="p-date-b2" />
-    </div>
-    <div class="field">
-      <label class="field-label">Seuil de variation</label>
-      <input type="text" id="p-threshold" value="±3 positions" />
-    </div>
-    <div class="field">
-      <label class="field-label">Hypothèses à explorer</label>
-      <div class="pills" id="p-hypotheses">
-        <span class="pill active-pill" data-value="Mise à jour Google">Mise à jour Google</span>
-        <span class="pill active-pill" data-value="Dégradation du contenu">Dégradation contenu</span>
-        <span class="pill active-pill" data-value="Nouveau concurrent">Nouveau concurrent</span>
-        <span class="pill active-pill" data-value="Problème technique">Problème technique</span>
-        <span class="pill active-pill" data-value="Cannibalisation">Cannibalisation</span>
-        <span class="pill" data-value="Saisonnalité">Saisonnalité</span>
+  <div class="panel-inner">
+    <div class="notice n-blue"><span class="notice-icon">✅</span>Données récupérées automatiquement via Ahrefs Rank Tracker · Export GSC optionnel</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#DBEAFE">📌</div>
+        <div><div class="card-title">Contexte & Périodes</div><div class="card-desc">Définissez les deux fenêtres de comparaison</div></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label class="field-label">Site <span class="req">*</span></label><input type="text" id="p-site" placeholder="ex : selectra.info"/></div>
+        <div class="field"><label class="field-label">Pays</label><input type="text" id="p-country" value="France"/></div>
+        <div class="field"><label class="field-label">Période A — début <span class="req">*</span></label><input type="date" id="p-date-a1"/></div>
+        <div class="field"><label class="field-label">Période A — fin <span class="req">*</span></label><input type="date" id="p-date-a2"/></div>
+        <div class="field"><label class="field-label">Période B — début <span class="req">*</span></label><input type="date" id="p-date-b1"/></div>
+        <div class="field"><label class="field-label">Période B — fin <span class="req">*</span></label><input type="date" id="p-date-b2"/></div>
+        <div class="field"><label class="field-label">Seuil de variation</label><input type="text" id="p-threshold" value="±3 positions"/></div>
+        <div class="field">
+          <label class="field-label">Hypothèses à explorer</label>
+          <div class="pills" id="p-hypotheses">
+            <span class="pill" data-value="Mise à jour Google" data-active="1">Mise à jour Google</span>
+            <span class="pill" data-value="Dégradation du contenu" data-active="1">Dégradation contenu</span>
+            <span class="pill" data-value="Nouveau concurrent" data-active="1">Nouveau concurrent</span>
+            <span class="pill" data-value="Problème technique" data-active="1">Problème technique</span>
+            <span class="pill" data-value="Cannibalisation" data-active="1">Cannibalisation</span>
+            <span class="pill" data-value="Saisonnalité" data-active="0">Saisonnalité</span>
+          </div>
+        </div>
+        <div class="field field-full">
+          <label class="field-label">Export GSC comparatif — optionnel</label>
+          <textarea id="p-export-gsc" placeholder="OPTIONNEL : export GSC avec comparaison de deux périodes à coller ici en CSV OU à joindre sur Claude." style="min-height:76px"></textarea>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-generate g-positions" onclick="generate('positions')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Générer le prompt</button>
+        <button class="btn-copy" id="copy-positions" onclick="copyPrompt('positions')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="3.5" width="7.5" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 3.5V2.5A1.5 1.5 0 016 1h5a1.5 1.5 0 011.5 1.5V8A1.5 1.5 0 0111 9.5h-1" stroke="currentColor" stroke-width="1.4"/></svg>Copier le prompt</button>
       </div>
     </div>
-    <div class="field field-full">
-      <label class="field-label">Export GSC comparatif — optionnel</label>
-      <textarea id="p-export-gsc" placeholder="OPTIONNEL : export GSC avec comparaison de deux périodes à coller ici en CSV OU à joindre sur Claude." style="min-height:70px"></textarea>
+    <div class="output-card" id="wrap-positions">
+      <div class="output-topbar"><span class="output-label">Prompt généré — prêt à coller dans Claude</span><div class="wdots"><span style="background:#EF4444"></span><span style="background:#F59E0B"></span><span style="background:#22C55E"></span></div></div>
+      <pre class="output-box" id="out-positions"></pre>
     </div>
   </div>
-  <div class="action-bar">
-    <button class="btn-generate" style="background:#1d4ed8;border-color:#1d4ed8" onclick="generate('positions')">Générer le prompt →</button>
-    <button class="btn-copy" id="copy-positions" onclick="copyPrompt('positions')">Copier le prompt</button>
-  </div>
-  <div class="output-label" id="label-positions">Prompt généré — prêt à coller dans Claude</div>
-  <pre class="output-box" id="out-positions"></pre>
 </div>
+
 <!-- QUICK WINS -->
 <div class="panel" id="panel-opps">
-  <div class="context-banner banner-opps">Export GSC requis · Filtrer en amont : position 4–20, impressions &gt; 50, période 3 mois</div>
-  <div class="form-grid">
-    <div class="field">
-      <label class="field-label">Site *</label>
-      <input type="text" id="o-site" placeholder="ex : selectra.info" />
-    </div>
-    <div class="field">
-      <label class="field-label">Secteur</label>
-      <input type="text" id="o-sector" placeholder="ex : Telecom / Énergie / Finance..." />
-    </div>
-    <div class="field">
-      <label class="field-label">Pays</label>
-      <input type="text" id="o-country" value="France" />
-    </div>
-    <div class="field">
-      <label class="field-label">Fourchette de positions</label>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="text" id="o-pos-min" value="4" style="width:80px" />
-        <span style="color:#9ca3af;font-size:13px">→</span>
-        <input type="text" id="o-pos-max" value="20" style="width:80px" />
+  <div class="panel-inner">
+    <div class="notice n-green"><span class="notice-icon">⚡</span>Export GSC requis · Filtrer en amont : position 4–20, impressions &gt; 50, période 3 mois</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#D1FAE5">📌</div>
+        <div><div class="card-title">Contexte</div><div class="card-desc">Paramètres de l'analyse</div></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label class="field-label">Site <span class="req">*</span></label><input type="text" id="o-site" placeholder="ex : selectra.info"/></div>
+        <div class="field"><label class="field-label">Secteur</label><input type="text" id="o-sector" placeholder="ex : Telecom / Énergie / Finance…"/></div>
+        <div class="field"><label class="field-label">Pays</label><input type="text" id="o-country" value="France"/></div>
+        <div class="field">
+          <label class="field-label">Fourchette de positions</label>
+          <div class="inline-pair"><input type="text" id="o-pos-min" value="4"/><span class="inline-sep">→</span><input type="text" id="o-pos-max" value="20"/></div>
+        </div>
+        <div class="field field-full"><label class="field-label">Clusters prioritaires</label><input type="text" id="o-clusters" placeholder="ex : fibre, box 4G, offres internet, comparatif"/></div>
       </div>
     </div>
-    <div class="field field-full">
-      <label class="field-label">Clusters prioritaires</label>
-      <input type="text" id="o-clusters" placeholder="ex : fibre, box 4G, offres internet, comparatif" />
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#D1FAE5">📥</div>
+        <div><div class="card-title">Données d'entrée</div><div class="card-desc">Export GSC à fournir</div></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Export GSC — Requêtes <span class="req">*</span><span class="badge badge-manual">export requis</span></label>
+        <textarea id="o-export-gsc" placeholder="Colle ici ton export GSC : requête, clics, impressions, CTR, position moyenne&#10;OU ajoute-le directement dans Claude."></textarea>
+        <div class="hint">GSC → Performance → Requêtes → Filtrer (position 4–20, impressions &gt; 50, 3 derniers mois)</div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-generate g-opps" onclick="generate('opps')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Générer le prompt</button>
+        <button class="btn-copy" id="copy-opps" onclick="copyPrompt('opps')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="3.5" width="7.5" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 3.5V2.5A1.5 1.5 0 016 1h5a1.5 1.5 0 011.5 1.5V8A1.5 1.5 0 0111 9.5h-1" stroke="currentColor" stroke-width="1.4"/></svg>Copier le prompt</button>
+      </div>
     </div>
-    <div class="field field-full">
-      <label class="field-label">Export GSC — Requêtes * <span class="badge-manual">export requis</span></label>
-      <textarea id="o-export-gsc" placeholder="Colle ici ton export GSC : requête, clics, impressions, CTR, position moyenne
-OU ajoute le directement dans Claude."></textarea>
-      <div class="export-hint">GSC → Performance → Requêtes → Filtrer (position 4–20, impressions &gt; 50, 3 derniers mois)</div>
+    <div class="output-card" id="wrap-opps">
+      <div class="output-topbar"><span class="output-label">Prompt généré — prêt à coller dans Claude</span><div class="wdots"><span style="background:#EF4444"></span><span style="background:#F59E0B"></span><span style="background:#22C55E"></span></div></div>
+      <pre class="output-box" id="out-opps"></pre>
     </div>
   </div>
-  <div class="action-bar">
-    <button class="btn-generate" style="background:#15803d;border-color:#15803d" onclick="generate('opps')">Générer le prompt →</button>
-    <button class="btn-copy" id="copy-opps" onclick="copyPrompt('opps')">Copier le prompt</button>
-  </div>
-  <div class="output-label" id="label-opps">Prompt généré — prêt à coller dans Claude</div>
-  <pre class="output-box" id="out-opps"></pre>
 </div>
+
 <script>
-const tabIds    = ['hebdo', 'optims', 'positions', 'opps'];
-const tabColors = { hebdo: 'active-hebdo', optims: 'active-optims', positions: 'active-positions', opps: 'active-opps' };
-function switchTab(id) {
-  tabIds.forEach((t, i) => {
-    const tab = document.querySelectorAll('.tab')[i];
-    tab.className = 'tab' + (t === id ? ' ' + tabColors[t] : '');
-    document.getElementById('panel-' + t).classList.toggle('active', t === id);
+const TABS=['hebdo','optims','positions','opps'];
+const TC={hebdo:'t-hebdo',optims:'t-optims',positions:'t-positions',opps:'t-opps'};
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach((btn,i)=>{
+    btn.className='tab-btn '+TC[TABS[i]]+(TABS[i]===id?' active':'');
   });
+  TABS.forEach(t=>document.getElementById('panel-'+t).classList.toggle('active',t===id));
 }
-const pillColors = { 'p-hypotheses': '#1d4ed8' };
-document.querySelectorAll('.pills').forEach(group => {
-  const color = pillColors[group.id] || '#374151';
-  group.querySelectorAll('.pill').forEach(pill => {
-    if (pill.classList.contains('active-pill')) {
-      pill.style.background = color;
-      pill.style.borderColor = color;
-      pill.style.color = '#fff';
-      pill.dataset.active = '1';
-    }
-    pill.addEventListener('click', () => {
-      const on = pill.dataset.active === '1';
-      if (on) {
-        pill.dataset.active = '0';
-        pill.style.background = '#fff';
-        pill.style.borderColor = '#d1d5db';
-        pill.style.color = '#6b7280';
-      } else {
-        pill.dataset.active = '1';
-        pill.style.background = color;
-        pill.style.borderColor = color;
-        pill.style.color = '#fff';
-      }
-    });
+document.querySelectorAll('.pills').forEach(group=>{
+  group.querySelectorAll('.pill').forEach(pill=>{
+    const on=(p)=>{p.dataset.active='1';p.style.background='#015AA3';p.style.borderColor='#015AA3';p.style.color='#fff';};
+    const off=(p)=>{p.dataset.active='0';p.style.background='';p.style.borderColor='';p.style.color='';};
+    if(pill.dataset.active==='1')on(pill);
+    pill.addEventListener('click',()=>pill.dataset.active==='1'?off(pill):on(pill));
   });
 });
-function getChecked(groupId) {
-  return Array.from(document.querySelectorAll('#' + groupId + ' .pill'))
-    .filter(p => p.dataset.active === '1')
-    .map(p => p.dataset.value);
+function getActivePills(id){return[...document.querySelectorAll('#'+id+' .pill')].filter(p=>p.dataset.active==='1').map(p=>p.dataset.value);}
+function v(id){return(document.getElementById(id)?.value||'').trim();}
+function showOutput(type,prompt){
+  document.getElementById('out-'+type).textContent=prompt;
+  document.getElementById('wrap-'+type).classList.add('visible');
+  document.getElementById('copy-'+type).classList.add('visible');
+  setTimeout(()=>document.getElementById('wrap-'+type).scrollIntoView({behavior:'smooth',block:'start'}),60);
 }
-function v(id) { return (document.getElementById(id)?.value || '').trim(); }
-function generate(type) {
-  let prompt = '';
-  if (type === 'hebdo') {
-    const site           = v('h-site') || '[NOM DU SITE]';
-    const lang           = v('h-lang') || 'français';
-    const perimetre      = v('h-perimetre') || '[à préciser]';
-    const marche         = v('h-marche') || '[à préciser]';
-    const ahrefsFilters  = v('h-ahrefs-filters');  // AJOUT DE CETTE LIGNE
-    const urlInclude     = v('h-url-include');
-    const urlExclude     = v('h-url-exclude');
-    const today          = new Date();
-    const s1             = new Date(today); s1.setDate(s1.getDate() - 7);
-    const fmt            = d => d.toISOString().split('T')[0];
-    const dateStr        = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
-    
-    const ahrefsBlock = ahrefsFilters 
-      ? `\nFILTRES AHREFS\n${ahrefsFilters}\n` 
-      : '';
-    
-    let filtresBlock = '';
-    if (urlInclude) {
-      const paths = urlInclude.split(',').map(s => s.trim()).filter(Boolean);
-      filtresBlock = `\nInclure uniquement les URLs contenant :\n${paths.map(p => '- ' + p).join('\n')}\n`;
-    } else if (urlExclude) {
-      const paths = urlExclude.split(',').map(s => s.trim()).filter(Boolean);
-      filtresBlock = `\nExclure les URLs contenant :\n${paths.map(p => '- ' + p).join('\n')}\n`;
-    }
-    
-    prompt =
-`Tu es un analyste SEO expert en interprétation de données de positionnement.
-Utilise le connecteur Ahrefs pour récupérer les données du site ${site} (Site Explorer → Organic Keywords). Génère le fichier Excel d'analyse hebdomadaire selon les instructions ci-dessous.
-CHAMPS DE CONTEXTE
-Site                  : ${site}
-Périmètre             : ${perimetre}
-Marché(s) analysé(s)  : ${marche}
-Langue de sortie      : ${lang}${ahrefsBlock}${filtresBlock}
-STRUCTURE DU FICHIER
-Deux onglets : "Analyse Mots-Clés S-1" et "Synthèse".
-ONGLET ANALYSE
-Tableau avec les colonnes : Catégorie / Pos. moy. / Pos. moy. S-1 / Keyword / Volume / KD / Pos. actuelle / Variation / URL.
-Identifie les clusters à partir des URLs en regroupant les mots-clés par répertoire (ex : /guide/, /installation/, /comparer-les-offres/, etc.).
-Crée un cluster par répertoire principal, nomme-le de façon lisible, et sélectionne ~10 MC parmi les plus pertinents (volume + KD + pertinence thématique).
-Si deux répertoires sont très proches thématiquement et peu fournis, tu peux les fusionner en un seul cluster.
-Pour la colonne "Pos. actuelle" : indique toujours la position numérique, y compris pour les nouveaux mots-clés.
-Pour la colonne "Variation" :
-- ▲ +X (vert) / ▼ -X (rouge) pour les variations
-- "New" (vert) pour les nouveaux MC sans historique
-- "Lost" (rouge) pour les MC perdus
-La position moyenne par cluster (colonne "Pos. moy.") se calcule sur les ~10 MC sélectionnés à partir de leur position actuelle.
-La colonne "Pos. moy. S-1" correspond à la position de la semaine précédente, récupérée via le connecteur (champ "best_position_prev").
-ONGLET SYNTHÈSE
-Analyse courte en 4 blocs :
-🟢 Points positifs
-🔴 Points de vigilance
-📊 Tendances par cluster
-💡 Actions recommandées
-Rédigée en ${lang}.
-RAPPEL TECHNIQUE
-Nom du fichier : analyse_keywords_${site}_${dateStr}.xlsx`;
+function generate(type){
+  const today=new Date();
+  const ds=String(today.getDate()).padStart(2,'0')+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+today.getFullYear();
+  let p='';
+  if(type==='hebdo'){
+    const site=v('h-site')||'[NOM DU SITE]',lang=v('h-lang')||'français',per=v('h-perimetre')||'[à préciser]',mar=v('h-marche')||'[à préciser]',exp=v('h-export');
+    p=`Tu es un analyste SEO expert en interprétation de données de positionnement.\nJe te joins un export Ahrefs pour ${site}. Génère le fichier Excel d'analyse hebdomadaire selon les instructions ci-dessous.\n\nCHAMPS DE CONTEXTE\nSite                  : ${site}\nPérimètre             : ${per}\nMarché(s) analysé(s)  : ${mar}\nLangue de sortie      : ${lang}\nDates à comparer      : Aujourd'hui vs S-1\n\nSTRUCTURE DU FICHIER\nDeux onglets : "Analyse Mots-Clés S-1" et "Synthèse".\n\nONGLET ANALYSE\nTableau avec les colonnes : Catégorie / Pos. moy. / Pos. moy. S-1 / Keyword / Volume / KD / Pos. actuelle / Variation / URL.\nIdentifie les clusters à partir des URLs présentes dans l'export en regroupant les mots-clés par répertoire (ex : /guide/, /installation/, /comparer-les-offres/, /offre-fibre/orange/, etc.).\nCrée un cluster par répertoire principal, nomme-le de façon lisible, et sélectionne ~10 MC parmi les plus pertinents (volume + KD + pertinence thématique).\nSi deux répertoires sont très proches thématiquement et peu fournis, tu peux les fusionner en un seul cluster.\nPour la colonne "Pos. actuelle" : indique toujours la position numérique, y compris pour les nouveaux mots-clés.\nPour la colonne "Variation" :\n- ▲ +X (vert) / ▼ -X (rouge) pour les variations\n- "New" (vert) pour les nouveaux MC sans historique\n- "Lost" (rouge) pour les MC perdus\nLa position moyenne par cluster (colonne "Pos. moy.") se calcule sur les ~10 MC sélectionnés à partir de leur position actuelle.\nLa colonne "Pos. moy. S-1" est la moyenne des positions S-1 de ces mêmes MC, lue directement depuis la colonne "Previous position" de l'export.\n\nONGLET SYNTHÈSE\nAnalyse courte en 4 blocs :\n🟢 Points positifs\n🔴 Points de vigilance\n📊 Tendances par cluster\n💡 Actions recommandées\nRédigée en ${lang}.\n\nRAPPEL TECHNIQUE\n- Export Ahrefs = positions du jour vs S-1\n- La colonne "Position change" = évolution vs S-1\n- Nom du fichier de sortie : analyse_keywords_${site}_${ds}.xlsx\n\n─── EXPORT AHREFS — ORGANIC KEYWORDS ───\n${exp||'[colle ici : Ahrefs → Site Explorer → Organic Keywords → Export CSV]'}`;
+  } else if(type==='optims'){
+    const site=v('x-site')||'[NOM DU SITE]',lang=v('x-lang')||'Français',urls=v('x-urls')||'[liste des URLs à surveiller]',kws=v('x-kw');
+    p=`Tu es un analyste SEO expert en interprétation de données et Data Visualization.\nTon objectif est de générer un fichier Excel d'analyse hebdomadaire pour le site ${site} en te concentrant sur les récentes optimisations.\n\nCONTEXTE ET CIBLAGE\nURLs stratégiques à surveiller (pages récemment optimisées ou créées) :\n${urls}\n${kws?'\nMots-clés "Top Priorité" (à inclure impérativement dans l\'analyse) :\n'+kws:''}\n\nSTRUCTURE DU FICHIER EXCEL\nGénère un fichier nommé : analyse_seo_optims_${site}_${ds}.xlsx\n\nDeux onglets :\n\nONGLET 1 : "Analyse Mots-Clés S-1"\nTableau avec les colonnes : URL / Keyword / Volume / KD / Pos. S-1 / Pos. Actuelle / Variation\n- Logique de tri : regroupe par URL\n- Variation : ▲ +X (vert) / ▼ -X (rouge) / "New" (vert) / "Lost" (rouge)\n- Sélection : affiche en priorité les mots-clés "Top Priorité" listés ci-dessus s'ils sont présents, complétés par les meilleurs MC pour atteindre ~10 MC par URL\n\nONGLET 2 : "Synthèse & KPI"\nRésumé analytique structuré en 4 blocs :\n🟢 Performances : quelles optimisations portent leurs fruits ?\n🔴 Alertes : pertes de positions sur les mots-clés à fort volume\n📊 KPI par URL : position moyenne actuelle vs S-1 pour chaque URL stratégique\n💡 Next Steps : recommandations concrètes (maillage interne, mise à jour contenu, etc.)\nRédigé en ${lang}.\n\nRAPPEL TECHNIQUE\n- Utilise la colonne "Previous position" pour la Pos. S-1\n- Utilise la colonne "Position" pour la Pos. Actuelle\n- Utilise l'export Ahrefs joint en PDF dans cette conversation.`;
+  } else if(type==='positions'){
+    const hyp=getActivePills('p-hypotheses'),gsc=v('p-export-gsc'),thr=v('p-threshold')||'±3 positions';
+    p=`Tu es un analyste SEO expert en interprétation de données de positionnement.\n\nCONTEXTE\nSite     : ${v('p-site')||'[NOM DU SITE]'}\nMarché   : ${v('p-country')||'France'}\nPériode A (référence) : ${v('p-date-a1')||'[date début]'} → ${v('p-date-a2')||'[date fin]'}\nPériode B (récente)   : ${v('p-date-b1')||'[date début]'} → ${v('p-date-b2')||'[date fin]'}\nSeuil de variation    : ${thr}\n\nNOTE : Les données de positionnement sont récupérées automatiquement depuis le Rank Tracker Ahrefs.\n\nMISSION — 3 sections :\n\nSECTION 1 — GAINS NOTABLES\nMots-clés ayant progressé de ${thr} ou plus, triés par volume décroissant.\nColonnes : Mot-clé | Volume | Position A | Position B | Delta | URL\n\nSECTION 2 — CHUTES SIGNIFICATIVES\nMots-clés ayant perdu ${thr} ou plus.\nPour chaque chute, propose une hypothèse parmi :\n${hyp.map(h=>'- '+h).join('\n')}\nColonnes : Mot-clé | Volume | Position A | Position B | Delta | URL | Hypothèse\n\nSECTION 3 — TENDANCES GÉNÉRALES\nRésumé de 5 à 8 lignes : clusters qui progressent / régressent, visibilité globale, points d'attention prioritaires.\n${gsc?'\n─── EXPORT GSC COMPARATIF ───\n'+gsc:''}`;
+  } else if(type==='opps'){
+    const site=v('o-site')||'[NOM DU SITE]',sec=v('o-sector')||'[secteur]',cou=v('o-country')||'France',pmi=v('o-pos-min')||'4',pma=v('o-pos-max')||'20',cls=v('o-clusters'),gsc=v('o-export-gsc');
+    p=`Tu es un consultant SEO senior. Je vais te fournir un export GSC pour le site ${site}.\n\nCONTEXTE\nSite    : ${site}\nSecteur : ${sec}\nMarché  : ${cou}\n${cls?'Clusters prioritaires : '+cls:''}\n\nDONNÉES FOURNIES\nExport GSC — Requêtes sur les 3 derniers mois, pré-filtré :\n- Position moyenne entre ${pmi} et ${pma}\n- Impressions > 50\n\nMISSION\nIdentifie les quick wins les plus actionnables : mots-clés déjà bien positionnés qui peuvent gagner des places avec des optimisations légères.\n\nPour chaque quick win, fournis :\n1. Le mot-clé + position actuelle + impressions + CTR\n2. L'URL positionnée\n3. Le gap estimé (nombre de positions à gagner pour atteindre le top 3)\n4. Une recommandation concrète et unique parmi :\n   - Optimisation title / H1\n   - Enrichissement sémantique du contenu\n   - Amélioration du maillage interne\n   - Reformulation de la meta description pour améliorer le CTR\n5. Priorité : Haute / Moyenne / Faible (basée sur les impressions et la position actuelle)\n\nFORMAT DE SORTIE\nTableau Markdown : Mot-clé | Position | Impressions | CTR | URL | Recommandation | Priorité\nTrié par priorité décroissante.\nPuis un encadré "Top 5 actions immédiates" avec les 5 quick wins les plus impactants.\n\n─── EXPORT GSC — REQUÊTES ───\n${gsc||'[colle ici : GSC → Performance → Requêtes → Télécharger]'}`;
   }
-  else if (type === 'optims') {
-    const site    = v('x-site') || '[NOM DU SITE]';
-    const lang    = v('x-lang') || 'Français';
-    const urls    = v('x-urls') || '[liste des URLs à surveiller]';
-    const kws     = v('x-kw');
-    const today   = new Date();
-    const dateStr = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
-    
-    prompt =
-`Tu es un analyste SEO expert en interprétation de données et Data Visualization.
-Utilise le connecteur Ahrefs pour le site ${site}. Ton objectif est de générer un fichier Excel d'analyse hebdomadaire en te concentrant sur les récentes optimisations.
-CONTEXTE ET CIBLAGE
-URLs stratégiques à surveiller (pages récemment optimisées ou créées) :
-${urls}
-${kws ? '\nMots-clés "Top Priorité" (à inclure impérativement dans l\'analyse) :\n' + kws : ''}
-STRUCTURE DU FICHIER EXCEL
-Génère un fichier nommé : analyse_seo_optims_${site}_${dateStr}.xlsx
-Deux onglets :
-ONGLET 1 : "Analyse Mots-Clés S-1"
-Tableau avec les colonnes : URL / Keyword / Volume / KD / Pos. S-1 / Pos. Actuelle / Variation
-- Logique de tri : regroupe par URL
-- Variation : ▲ +X (vert) / ▼ -X (rouge) / "New" (vert) / "Lost" (rouge)
-- Sélection : affiche en priorité les mots-clés "Top Priorité" listés ci-dessus s'ils sont présents, complétés par les meilleurs MC pour atteindre ~10 MC par URL
-ONGLET 2 : "Synthèse & KPI"
-Résumé analytique structuré en 4 blocs :
-🟢 Performances : quelles optimisations portent leurs fruits ?
-🔴 Alertes : pertes de positions sur les mots-clés à fort volume
-📊 KPI par URL : position moyenne actuelle vs S-1 pour chaque URL stratégique
-💡 Next Steps : recommandations concrètes (maillage interne, mise à jour contenu, etc.)
-Rédigé en ${lang}.
-RAPPEL TECHNIQUE
-- Champs à utiliser : best_position (pos. actuelle), best_position_prev (pos. S-1), best_position_diff (variation)
-- Si un export Ahrefs a été joint en PDF dans cette conversation, utilise-le en priorité. Sinon, récupère les données via le connecteur.`;
-  }
-  else if (type === 'positions') {
-    const hypotheses = getChecked('p-hypotheses');
-    const exportGSC  = v('p-export-gsc');
-    const threshold  = v('p-threshold') || '±3 positions';
-    
-    prompt =
-`Tu es un analyste SEO expert en interprétation de données de positionnement.
-CONTEXTE
-Site     : ${v('p-site') || '[NOM DU SITE]'}
-Marché   : ${v('p-country') || 'France'}
-Période A (référence) : ${v('p-date-a1') || '[date début]'} → ${v('p-date-a2') || '[date fin]'}
-Période B (récente)   : ${v('p-date-b1') || '[date début]'} → ${v('p-date-b2') || '[date fin]'}
-Seuil de variation    : ${threshold}
-NOTE : Les données de positionnement sont récupérées automatiquement depuis le Rank Tracker Ahrefs.
-MISSION — 3 sections :
-SECTION 1 — GAINS NOTABLES
-Mots-clés ayant progressé de ${threshold} ou plus, triés par volume décroissant.
-Colonnes : Mot-clé | Volume | Position A | Position B | Delta | URL
-SECTION 2 — CHUTES SIGNIFICATIVES
-Mots-clés ayant perdu ${threshold} ou plus.
-Pour chaque chute, propose une hypothèse parmi :
-${hypotheses.map(h => '- ' + h).join('\n')}
-Colonnes : Mot-clé | Volume | Position A | Position B | Delta | URL | Hypothèse
-SECTION 3 — TENDANCES GÉNÉRALES
-Résumé de 5 à 8 lignes : clusters qui progressent / régressent, visibilité globale, points d'attention prioritaires.
-${exportGSC ? '\n─── EXPORT GSC COMPARATIF ───\n' + exportGSC : ''}`;
-  }
-  else if (type === 'opps') {
-    const site      = v('o-site') || '[NOM DU SITE]';
-    const sector    = v('o-sector') || '[secteur]';
-    const country   = v('o-country') || 'France';
-    const posMin    = v('o-pos-min') || '4';
-    const posMax    = v('o-pos-max') || '20';
-    const clusters  = v('o-clusters');
-    const exportGSC = v('o-export-gsc');
-    
-    prompt =
-`Tu es un consultant SEO senior. Je vais te fournir un export GSC pour le site ${site}.
-CONTEXTE
-Site    : ${site}
-Secteur : ${sector}
-Marché  : ${country}
-${clusters ? 'Clusters prioritaires : ' + clusters : ''}
-DONNÉES FOURNIES
-Export GSC — Requêtes sur les 3 derniers mois, pré-filtré :
-- Position moyenne entre ${posMin} et ${posMax}
-- Impressions > 50
-MISSION
-Identifie les quick wins les plus actionnables : mots-clés déjà bien positionnés qui peuvent gagner des places avec des optimisations légères.
-Pour chaque quick win, fournis :
-1. Le mot-clé + position actuelle + impressions + CTR
-2. L'URL positionnée
-3. Le gap estimé (nombre de positions à gagner pour atteindre le top 3)
-4. Une recommandation concrète et unique parmi :
-   - Optimisation title / H1
-   - Enrichissement sémantique du contenu
-   - Amélioration du maillage interne
-   - Reformulation de la meta description pour améliorer le CTR
-5. Priorité : Haute / Moyenne / Faible (basée sur les impressions et la position actuelle)
-FORMAT DE SORTIE
-Tableau Markdown : Mot-clé | Position | Impressions | CTR | URL | Recommandation | Priorité
-Trié par priorité décroissante.
-Puis un encadré "Top 5 actions immédiates" avec les 5 quick wins les plus impactants.
-─── EXPORT GSC — REQUÊTES ───
-${exportGSC || '[colle ici : GSC → Performance → Requêtes → Télécharger]'}`;
-  }
-  
-  document.getElementById('out-' + type).textContent = prompt;
-  document.getElementById('out-' + type).classList.add('visible');
-  document.getElementById('label-' + type).classList.add('visible');
-  document.getElementById('copy-' + type).classList.add('visible');
-  document.getElementById('out-' + type).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showOutput(type,p);
 }
-function copyPrompt(type) {
-  const text = document.getElementById('out-' + type).textContent;
-  const btn  = document.getElementById('copy-' + type);
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'Copié ✓';
+function copyPrompt(type){
+  const text=document.getElementById('out-'+type).textContent;
+  const btn=document.getElementById('copy-'+type);
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.innerHTML='<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Copié !';
     btn.classList.add('success');
-    setTimeout(() => { btn.textContent = 'Copier le prompt'; btn.classList.remove('success'); }, 2000);
+    setTimeout(()=>{btn.innerHTML='<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="3.5" width="7.5" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 3.5V2.5A1.5 1.5 0 016 1h5a1.5 1.5 0 011.5 1.5V8A1.5 1.5 0 0111 9.5h-1" stroke="currentColor" stroke-width="1.4"/></svg> Copier le prompt';btn.classList.remove('success');},2200);
   });
 }
 </script>
